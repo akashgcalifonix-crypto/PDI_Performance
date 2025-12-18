@@ -3,89 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDI Performance System</title>
-    <!-- Libraries -->
+    <title>PDI Master System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 
     <style>
-        body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; }
+        /* FONT SIZE INCREASED */
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; font-size: 16px; }
+        h1, h2, h3, h4, h5, h6 { font-weight: bold; }
+        .table { font-size: 15px; }
+        .form-control, .form-select { font-size: 15px; padding: 10px; }
+        .btn { font-size: 16px; font-weight: bold; }
+
+        /* HEADER */
+        .app-header { background: white; border-bottom: 5px solid #003366; padding: 15px 30px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .logo { height: 60px; }
         
-        /* Header */
-        .app-header { background: white; border-bottom: 4px solid #003366; padding: 10px 30px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .logo { height: 50px; }
-        .app-title { color: #003366; font-weight: bold; margin: 0; font-size: 24px; text-transform: uppercase; }
+        /* CARDS */
+        .card { border: none; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 25px; }
+        .card-header { background: #003366; color: white; font-size: 18px; padding: 12px 20px; border-radius: 10px 10px 0 0 !important; }
 
-        /* Navigation */
-        .nav-pills .nav-link.active { background-color: #003366; }
-        .nav-pills .nav-link { color: #555; font-weight: 600; margin-right: 10px; }
-
-        /* Cards */
-        .card { border: none; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .card-header { background: #003366; color: white; font-weight: bold; border-radius: 8px 8px 0 0 !important; }
-
-        /* Lot Entry Table */
-        .lot-table th { background: #f8f9fa; font-size: 13px; text-align: center; }
-        .lot-table td { vertical-align: middle; padding: 5px; }
-        .defect-section { background: #fff5f5; padding: 10px; border: 1px dashed red; border-radius: 4px; display: none; margin-top: 5px; }
+        /* LOT ENTRY */
+        .lot-table th { background: #e9ecef; text-align: center; font-size: 15px; }
+        .lot-table td { vertical-align: middle; }
         
-        /* Dashboard */
-        .kpi-box { background: white; padding: 15px; border-radius: 8px; border-left: 5px solid #003366; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; }
-        .kpi-val { font-size: 24px; font-weight: bold; color: #333; }
-        .kpi-lbl { font-size: 12px; color: #666; text-transform: uppercase; font-weight: bold; }
+        /* DASHBOARD */
+        .kpi-box { background: white; padding: 20px; border-radius: 10px; border-left: 6px solid #003366; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; }
+        .kpi-val { font-size: 32px; font-weight: bold; color: #333; margin-top: 5px; }
+        .kpi-lbl { font-size: 14px; color: #666; text-transform: uppercase; font-weight: 800; }
+        
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 13px; color: white; }
+        .bg-open { background-color: #dc3545; } /* Red for Open/Fail */
+        .bg-closed { background-color: #28a745; } /* Green for Pass/Closed */
+        .bg-hold { background-color: #ffc107; color: #000; }
 
-        /* Action Plan */
-        .action-table th { background: #333; color: white; }
+        /* LOADING */
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 24px; color: #003366; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
 
+<div id="loader">Processing Data... Please Wait...</div>
+
 <!-- Header -->
 <div class="app-header">
     <div class="d-flex align-items-center gap-3">
-        <img src="https://i.postimg.cc/5y7SN4xc/logo.png" class="logo" id="logoImg">
-        <h1 class="app-title">PDI Performance Report</h1>
+        <img src="https://i.postimg.cc/5y7SN4xc/logo.png" class="logo">
+        <h2 class="m-0 text-primary fw-bold">PDI Master System</h2>
     </div>
     <div class="nav nav-pills">
-        <button class="nav-link active" onclick="switchTab('form')">Data Entry</button>
-        <button class="nav-link" onclick="switchTab('dashboard')">Dashboard & Analysis</button>
+        <button class="nav-link active btn btn-outline-primary" onclick="switchTab('form')">📝 Data Entry</button>
+        <button class="nav-link btn btn-outline-primary ms-2" onclick="switchTab('dashboard')">📊 Live Dashboard</button>
     </div>
 </div>
 
-<div class="container-fluid mt-4">
+<div class="container-fluid mt-4" style="padding-bottom:100px;">
     
-    <!-- 1. DATA ENTRY SECTION -->
+    <!-- 1. DATA ENTRY TAB -->
     <div id="tab-form">
         <form id="pdiForm">
-            <input type="hidden" id="editIndex"> <!-- For Editing -->
+            <input type="hidden" id="editRowIndex"> <!-- Stores Google Sheet Row Index -->
             
-            <!-- Master Info -->
             <div class="card">
                 <div class="card-header">General Information</div>
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Date</label>
+                            <label class="form-label">Date</label>
                             <input type="date" id="date" class="form-control" required>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Line No</label>
+                            <label class="form-label">Line No (1-21)</label>
                             <select id="line" class="form-select" onchange="detectFloor()" required>
-                                <option value="">Select Line</option>
-                                <!-- JS will populate 1-21 -->
+                                <option value="">Select</option>
                             </select>
-                            <small class="text-primary fw-bold" id="floorDisplay"></small>
+                            <div class="mt-1 fw-bold text-primary" id="floorDisplay">--</div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Model</label>
+                            <label class="form-label">Model</label>
                             <select id="model" class="form-select">
-                                <option>Model A</option><option>Model B</option><option>Model C</option>
+                                <option>Model X</option><option>Model Y</option><option>Model Z</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Color</label>
+                            <label class="form-label">Color</label>
                             <select id="color" class="form-select">
                                 <option>Black</option><option>White</option><option>Blue</option>
                             </select>
@@ -94,511 +97,456 @@
                 </div>
             </div>
 
-            <!-- Lots Section -->
+            <!-- Single Lot Entry for Simplification in Sheet, or Multiple handled by Loop -->
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Lot Details (Add Multiple)</span>
-                    <button type="button" class="btn btn-sm btn-light text-dark fw-bold" onclick="addLotRow()">+ Add Lot</button>
+                <div class="card-header d-flex justify-content-between">
+                    <span>Lot Details</span>
+                    <button type="button" class="btn btn-light btn-sm fw-bold" onclick="addLotRow()">+ Add Another Lot</button>
                 </div>
                 <div class="card-body p-2">
-                    <table class="table table-bordered lot-table mb-0">
-                        <thead>
+                    <table class="table table-bordered lot-table">
+                        <thead class="table-light">
                             <tr>
-                                <th width="15%">Lot ID</th>
-                                <th width="10%">Qty</th>
-                                <th width="15%">Status</th>
-                                <th width="15%">Result</th>
-                                <th width="40%">Defect Info (If Fail)</th>
-                                <th width="5%">Action</th>
+                                <th>Lot ID</th><th>Qty</th><th>Type</th><th>Result</th><th>Defect Info (If Fail)</th><th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="lotContainer">
-                            <!-- Rows added by JS -->
-                        </tbody>
+                        <tbody id="lotContainer"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div class="text-end mb-5">
-                <button type="button" class="btn btn-secondary me-2" onclick="resetForm()">Clear</button>
-                <button type="submit" class="btn btn-success px-5">Save Record</button>
+            <div class="text-end">
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">Clear Form</button>
+                <button type="submit" class="btn btn-success px-5 ms-2" id="saveBtn">✅ Save to Google Sheet</button>
             </div>
         </form>
-
-        <!-- Data List -->
-        <div class="card">
-            <div class="card-header">Recent Entries</div>
-            <div class="card-body">
-                <table class="table table-hover table-sm text-center">
-                    <thead class="table-dark">
-                        <tr><th>Date</th><th>Line</th><th>Model</th><th>Lots</th><th>Total Qty</th><th>Result (Pass/Fail)</th><th>Actions</th></tr>
-                    </thead>
-                    <tbody id="dataTable"></tbody>
-                </table>
-            </div>
-        </div>
     </div>
 
-    <!-- 2. DASHBOARD SECTION -->
+    <!-- 2. DASHBOARD TAB -->
     <div id="tab-dashboard" style="display:none;">
-        <!-- Filters -->
-        <div class="card p-3 mb-3">
-            <div class="row g-2 align-items-end">
-                <div class="col-md-3"><label>Start Date</label><input type="date" id="dashStart" class="form-control"></div>
-                <div class="col-md-3"><label>End Date</label><input type="date" id="dashEnd" class="form-control"></div>
-                <div class="col-md-2"><button class="btn btn-primary w-100" onclick="loadDashboard()">Filter Data</button></div>
-                <div class="col-md-4 text-end"><button class="btn btn-danger" onclick="downloadPPT()"><i class="bi bi-file-ppt"></i> Download PPT Report</button></div>
-            </div>
-        </div>
-
-        <!-- KPIs -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-3"><div class="kpi-box"><div class="kpi-lbl">Total Lots Offered</div><div class="kpi-val" id="kpi_lots">0</div></div></div>
-            <div class="col-md-3"><div class="kpi-box"><div class="kpi-lbl">Total Qty Offered</div><div class="kpi-val" id="kpi_qty">0</div></div></div>
-            <div class="col-md-3"><div class="kpi-box" style="border-color:#28a745"><div class="kpi-lbl">PDI LAR % (Lot Wise)</div><div class="kpi-val text-success" id="kpi_lar">0%</div></div></div>
-            <div class="col-md-3"><div class="kpi-box" style="border-color:#17a2b8"><div class="kpi-lbl">PDI Pass Rate % (Qty Wise)</div><div class="kpi-val text-info" id="kpi_pass">0%</div></div></div>
-        </div>
-
-        <!-- Charts Row 1 -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                <div class="card"><div class="card-body" style="height:350px;" id="chart_trend_qty"></div></div>
-            </div>
-            <div class="col-md-6">
-                <div class="card"><div class="card-body" style="height:350px;" id="chart_trend_lot"></div></div>
-            </div>
-        </div>
-
-        <!-- Floor Wise -->
-        <div class="card mb-4">
-            <div class="card-header">Floor Wise Performance</div>
+        
+        <!-- TRACEABILITY SEARCH -->
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">🔍 Lot Traceability</div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6"><div style="height:300px;" id="chart_floor_lar"></div></div>
-                    <div class="col-md-6"><div style="height:300px;" id="chart_floor_pass"></div></div>
+                <div class="row g-2">
+                    <div class="col-md-4"><input type="text" id="traceId" class="form-control" placeholder="Enter Lot ID (e.g. A01)"></div>
+                    <div class="col-md-2"><button class="btn btn-dark w-100" onclick="traceLot()">Trace</button></div>
+                    <div class="col-md-6 text-end"><button class="btn btn-secondary" onclick="loadDashboard()">🔄 Refresh Data</button></div>
                 </div>
+                <div id="traceResult" class="mt-3"></div>
             </div>
         </div>
 
-        <!-- Defect Analysis & Action Plan -->
-        <div class="row g-3">
-            <div class="col-md-5">
-                <div class="card">
-                    <div class="card-header">Top 5 Defects (Pareto)</div>
-                    <div class="card-body" style="height:400px;" id="chart_pareto"></div>
+        <!-- OPEN LOTS SUMMARY -->
+        <div class="row">
+            <div class="col-md-8">
+                 <div class="card h-100">
+                    <div class="card-header bg-danger text-white">⚠️ Open Lots (Failed & Not Passed Yet)</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-4">
+                                <h5>Floor 1</h5>
+                                <ul id="list_f1" class="list-group list-group-flush small"></ul>
+                            </div>
+                            <div class="col-4">
+                                <h5>Floor 2</h5>
+                                <ul id="list_f2" class="list-group list-group-flush small"></ul>
+                            </div>
+                            <div class="col-4">
+                                <h5>Basement</h5>
+                                <ul id="list_fb" class="list-group list-group-flush small"></ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-md-4">
                 <div class="card h-100">
-                    <div class="card-header bg-danger text-white">Defect Analysis & Action Plan</div>
-                    <div class="card-body">
-                        <table class="table table-bordered action-table">
-                            <thead><tr><th>Defect</th><th>Qty</th><th>Root Cause & Action Plan</th></tr></thead>
-                            <tbody id="actionPlanBody">
-                                <!-- Top 5 defects auto populated -->
-                            </tbody>
-                        </table>
-                        <textarea class="form-control mt-2" id="generalAction" rows="3" placeholder="Overall Remarks / Management Comments..."></textarea>
+                    <div class="card-header bg-success text-white">🏆 Closure Analysis</div>
+                    <div class="card-body text-center">
+                        <div class="kpi-lbl">Total Unique Lots</div>
+                        <div class="kpi-val" id="kpi_uniq_lots">0</div>
+                        <hr>
+                        <div class="kpi-lbl">Closed (Passed)</div>
+                        <div class="kpi-val text-success" id="kpi_closed">0</div>
+                        <hr>
+                        <div class="kpi-lbl">Closure Rate</div>
+                        <div class="kpi-val text-primary" id="kpi_closure">0%</div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- COLOR WISE ANALYSIS -->
+        <div class="card mt-3">
+            <div class="card-header">🎨 Color Wise Performance</div>
+            <div class="card-body">
+                <table class="table table-bordered text-center">
+                    <thead class="table-dark"><tr><th>Color</th><th>Total Qty</th><th>Pass Qty</th><th>Pass Rate %</th></tr></thead>
+                    <tbody id="colorTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MAIN DATA TABLE (EDIT/DELETE) -->
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between">
+                <span>📑 All Records (Google Sheet Data)</span>
+                <button class="btn btn-light btn-sm" onclick="downloadPPT()">Download PPT</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" style="max-height: 500px;">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead class="table-dark" style="position: sticky; top: 0;">
+                            <tr>
+                                <th>Date</th><th>Line</th><th>Lot ID</th><th>Qty</th><th>Result</th><th>Defect</th><th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="masterTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="modal fade" id="prevModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white"><h5 class="modal-title">Record Preview</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body" id="prevBody"></div>
+        </div>
     </div>
 </div>
 
 <script>
-// --- CONFIG & STATE ---
-// ⚠️ PASTE YOUR GOOGLE SCRIPT URL HERE FOR SAVING
-const API_URL = "https://script.google.com/macros/s/AKfycbzkn_YQtnDPW47OTPt9ZlASfj66JMmYdGjbCOvhVL3mwXvfERdtFY761KDqut88dv42FQ/exec"; 
+// ===========================================
+// ⚠️ SETUP YOUR GOOGLE APPS SCRIPT URL HERE
+// ===========================================
+const API_URL = "https://script.google.com/macros/s/AKfycbyKy7X0OWvjeMSVpM36HGH3fVE_XQQ8alDUbhh1msX9gjVPHBtGvdvgkuOefSGfSRX7/exec"; 
 
-let allData = []; // Stores local session data
-google.charts.load('current', {'packages':['corechart', 'bar']});
+let sheetData = []; // Stores raw array from Sheet
 
 // --- INITIALIZATION ---
 window.onload = function() {
-    // Populate Lines 1-21
     let lineSel = document.getElementById('line');
-    for(let i=1; i<=21; i++) {
-        let opt = document.createElement('option');
-        opt.value = i; opt.innerText = "Line " + i;
-        lineSel.appendChild(opt);
-    }
+    for(let i=1; i<=21; i++) lineSel.add(new Option(i, i));
     document.getElementById('date').valueAsDate = new Date();
-    document.getElementById('dashStart').valueAsDate = new Date();
-    document.getElementById('dashEnd').valueAsDate = new Date();
-    
-    addLotRow(); // Add first empty row
-    loadFakeData(); // For demo, replace with API fetch
+    addLotRow();
+    loadDashboard(); // Fetch data on load
 };
 
 function switchTab(tab){
-    document.getElementById('tab-form').style.display = tab==='form' ? 'block' : 'none';
-    document.getElementById('tab-dashboard').style.display = tab==='dashboard' ? 'block' : 'none';
+    document.getElementById('tab-form').style.display = tab==='form'?'block':'none';
+    document.getElementById('tab-dashboard').style.display = tab==='dashboard'?'block':'none';
     document.querySelector('.nav-link.active').classList.remove('active');
     event.target.classList.add('active');
-    if(tab === 'dashboard') loadDashboard();
 }
 
 function detectFloor(){
-    let l = parseInt(document.getElementById('line').value);
-    let f = "";
-    if(l >= 1 && l <= 8) f = "1st Floor";
-    else if(l >= 9 && l <= 16) f = "2nd Floor";
-    else if(l >= 17 && l <= 21) f = "Basement";
-    document.getElementById('floorDisplay').innerText = f;
+    let l = parseInt(document.getElementById('line').value || 0);
+    let f = (l>=1 && l<=8) ? "Floor 1" : (l>=9 && l<=16) ? "Floor 2" : "Basement";
+    document.getElementById('floorDisplay').innerText = l ? f : '--';
     return f;
 }
 
-// --- FORM LOGIC ---
+// --- DATA ENTRY LOGIC ---
 function addLotRow(data = null){
     const tbody = document.getElementById('lotContainer');
     const tr = document.createElement('tr');
     tr.className = 'lot-row';
-    
-    let html = `
-        <td><input type="text" class="form-control form-control-sm l-id" placeholder="Lot ID"></td>
-        <td><input type="number" class="form-control form-control-sm l-qty" placeholder="0"></td>
+    tr.innerHTML = `
+        <td><input type="text" class="form-control l-id" placeholder="Ex: A01" required style="font-weight:bold;"></td>
+        <td><input type="number" class="form-control l-qty" placeholder="0" required></td>
+        <td><select class="form-select l-status"><option>Fresh</option><option>Rework</option></select></td>
         <td>
-            <select class="form-select form-select-sm l-status">
-                <option>Fresh</option><option>Rework</option><option>Warranty</option><option>Market Rework</option>
-            </select>
-        </td>
-        <td>
-            <select class="form-select form-select-sm l-result" onchange="toggleDefect(this)">
-                <option value="Pass">Pass</option><option value="Fail">Fail</option><option value="Hold">Hold</option>
+            <select class="form-select l-result fw-bold" onchange="toggleDefect(this)">
+                <option value="Pass" style="color:green">Pass</option>
+                <option value="Fail" style="color:red">Fail</option>
+                <option value="Hold" style="color:orange">Hold</option>
             </select>
         </td>
         <td>
             <div class="defect-inputs" style="display:none;">
-                <div class="input-group input-group-sm mb-1">
-                    <input type="text" class="form-control d-name" placeholder="Defect Name">
-                    <input type="number" class="form-control d-qty" placeholder="Qty">
-                </div>
-                <div class="input-group input-group-sm mb-1">
-                    <select class="form-select d-stage"><option>LQC</option><option>FT</option><option>Packing</option></select>
-                    <select class="form-select d-belong"><option>Earbuds</option><option>Case</option></select>
-                </div>
-                <input type="text" class="form-control form-control-sm d-analysis" placeholder="Analysis / Root Cause">
+                <input type="text" class="form-control d-name mb-1" placeholder="Defect Name">
+                <input type="number" class="form-control d-qty mb-1" placeholder="Defect Qty">
+                <input type="text" class="form-control d-ana" placeholder="Analysis">
             </div>
-            <span class="pass-msg text-success small fw-bold">No Defects (Passed)</span>
+            <span class="pass-msg text-success fw-bold">OK</span>
         </td>
-        <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()">X</button></td>
+        <td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">X</button></td>
     `;
-    tr.innerHTML = html;
     tbody.appendChild(tr);
-
-    if(data) {
-        tr.querySelector('.l-id').value = data.id;
-        tr.querySelector('.l-qty').value = data.qty;
-        tr.querySelector('.l-status').value = data.status;
-        tr.querySelector('.l-result').value = data.result;
+    if(data){
+        // Pre-fill logic for edit
+        tr.querySelector('.l-id').value = data[5];
+        tr.querySelector('.l-qty').value = data[6];
+        tr.querySelector('.l-status').value = data[7];
+        tr.querySelector('.l-result').value = data[8];
         toggleDefect(tr.querySelector('.l-result'));
-        if(data.result === 'Fail'){
-            tr.querySelector('.d-name').value = data.d_name;
-            tr.querySelector('.d-qty').value = data.d_qty;
-            tr.querySelector('.d-stage').value = data.d_stage;
-            tr.querySelector('.d-belong').value = data.d_belong;
-            tr.querySelector('.d-analysis').value = data.d_analysis;
+        if(data[8]==='Fail'){
+            tr.querySelector('.d-name').value = data[9];
+            tr.querySelector('.d-qty').value = data[10];
+            tr.querySelector('.d-ana').value = data[12];
         }
     }
 }
 
-function toggleDefect(select){
-    const cell = select.closest('tr').cells[4];
-    const inputs = cell.querySelector('.defect-inputs');
-    const msg = cell.querySelector('.pass-msg');
-    
-    if(select.value === 'Fail'){
-        inputs.style.display = 'block';
-        msg.style.display = 'none';
+function toggleDefect(sel){
+    let cell = sel.closest('td').nextElementSibling;
+    if(sel.value === 'Fail'){
+        cell.querySelector('.defect-inputs').style.display='block';
+        cell.querySelector('.pass-msg').style.display='none';
     } else {
-        inputs.style.display = 'none';
-        msg.style.display = 'block';
+        cell.querySelector('.defect-inputs').style.display='none';
+        cell.querySelector('.pass-msg').style.display='block';
     }
 }
 
-document.getElementById('pdiForm').addEventListener('submit', function(e){
+document.getElementById('pdiForm').addEventListener('submit', async function(e){
     e.preventDefault();
+    if(!API_URL.includes("script.google.com")){ alert("Add API URL first!"); return; }
     
-    // Collect Header
-    let record = {
-        id: Date.now(),
-        date: document.getElementById('date').value,
-        line: document.getElementById('line').value,
-        floor: document.getElementById('floorDisplay').innerText,
-        model: document.getElementById('model').value,
-        color: document.getElementById('color').value,
-        lots: []
-    };
+    document.getElementById('loader').style.display = 'flex';
+    let btn = document.getElementById('saveBtn'); btn.disabled=true;
+    
+    // Master Info
+    let date = document.getElementById('date').value;
+    let line = document.getElementById('line').value;
+    let floor = document.getElementById('floorDisplay').innerText;
+    let model = document.getElementById('model').value;
+    let color = document.getElementById('color').value;
 
-    // Collect Lots
-    let rows = document.querySelectorAll('.lot-row');
-    rows.forEach(r => {
-        let lot = {
-            id: r.querySelector('.l-id').value,
-            qty: parseInt(r.querySelector('.l-qty').value) || 0,
-            status: r.querySelector('.l-status').value,
-            result: r.querySelector('.l-result').value,
-            d_name: "", d_qty: 0, d_stage: "", d_belong: "", d_analysis: ""
-        };
-        if(lot.result === 'Fail'){
-            lot.d_name = r.querySelector('.d-name').value;
-            lot.d_qty = parseInt(r.querySelector('.d-qty').value) || 0;
-            lot.d_stage = r.querySelector('.d-stage').value;
-            lot.d_belong = r.querySelector('.d-belong').value;
-            lot.d_analysis = r.querySelector('.d-analysis').value;
-        }
-        record.lots.push(lot);
+    let rowsToSave = [];
+    document.querySelectorAll('.lot-row').forEach(tr => {
+        let result = tr.querySelector('.l-result').value;
+        let d_name = result==='Fail' ? tr.querySelector('.d-name').value : "";
+        let d_qty = result==='Fail' ? tr.querySelector('.d-qty').value : 0;
+        let d_ana = result==='Fail' ? tr.querySelector('.d-ana').value : "";
+        
+        // Google Sheet Row Structure: [Date, Line, Floor, Model, Color, LotID, Qty, Status, Result, DefectName, DefectQty, Stage, Analysis]
+        rowsToSave.push([
+            date, line, floor, model, color,
+            tr.querySelector('.l-id').value.toUpperCase(),
+            tr.querySelector('.l-qty').value,
+            tr.querySelector('.l-status').value,
+            result, d_name, d_qty, "PDI", d_ana
+        ]);
     });
 
-    let editIdx = document.getElementById('editIndex').value;
-    if(editIdx){
-        allData[editIdx] = record;
-        document.getElementById('editIndex').value = "";
-    } else {
-        allData.push(record);
-    }
+    let editIdx = document.getElementById('editRowIndex').value;
+    let payload = { action: "save", data: rowsToSave };
     
-    alert("Saved Successfully!");
-    resetForm();
-    renderTable();
-    // In real app, perform fetch(API_URL, ...) here
+    if(editIdx !== "") {
+        // Edit Mode: We only support single lot editing in this simplified logic for Google Sheets Row Update
+        payload = { action: "edit", rowIndex: editIdx, data: rowsToSave[0] };
+    }
+
+    try {
+        await fetch(API_URL, {method:'POST', body:JSON.stringify(payload)});
+        alert("Saved Successfully!");
+        resetForm();
+        loadDashboard(); // Refresh
+    } catch(err) { alert("Error saving data"); console.error(err); }
+    finally { document.getElementById('loader').style.display = 'none'; btn.disabled=false; }
 });
 
 function resetForm(){
     document.getElementById('pdiForm').reset();
     document.getElementById('lotContainer').innerHTML = "";
+    document.getElementById('editRowIndex').value = "";
     addLotRow();
 }
 
-function renderTable(){
-    const tb = document.getElementById('dataTable');
-    tb.innerHTML = "";
-    allData.forEach((r, idx) => {
-        let totalQty = r.lots.reduce((acc, l) => acc + l.qty, 0);
-        let failCount = r.lots.filter(l => l.result === 'Fail').length;
-        let overall = failCount > 0 ? `<span class="badge bg-danger">Fail (${failCount})</span>` : `<span class="badge bg-success">Pass</span>`;
+// ===========================================
+// DASHBOARD & LOGIC
+// ===========================================
+async function loadDashboard(){
+    if(!API_URL.includes("script.google.com")) return;
+    document.getElementById('loader').style.display = 'flex';
+    try {
+        let res = await fetch(API_URL);
+        let json = await res.json();
+        sheetData = json.data; // Raw array
         
+        // Remove Header if exists and starts with "Date"
+        if(sheetData.length > 0 && sheetData[0][0] === "Date") sheetData.shift();
+
+        processData(sheetData);
+        renderTable(sheetData);
+    } catch(e) { console.error(e); }
+    finally { document.getElementById('loader').style.display = 'none'; }
+}
+
+function processData(rows){
+    // 1. Group by Lot ID to find latest status
+    // Logic: Same Lot ID, latest timestamp (bottom of sheet) wins for status.
+    let uniqueLots = {}; // { 'A01': { currentStatus: 'Pass', history: [] } }
+    
+    rows.forEach(r => {
+        let id = r[5]; // Lot ID Column
+        let result = r[8]; // Result Column
+        let floor = r[2]; 
+        let line = r[1];
+        let color = r[4];
+        let qty = parseInt(r[6]||0);
+        let defQty = parseInt(r[10]||0);
+
+        if(!uniqueLots[id]) uniqueLots[id] = { history: [], floor: floor, line: line, color: color, qty:qty };
+        uniqueLots[id].history.push(r);
+        uniqueLots[id].currentStatus = result; // Updates to latest
+        uniqueLots[id].lastDefect = r[9];
+        uniqueLots[id].passQty = (result === 'Pass') ? qty : (qty - defQty);
+    });
+
+    // 2. Open Lots & Closure
+    let openLots = { f1: [], f2: [], fb: [] };
+    let totalUniq = 0;
+    let closed = 0;
+    let colorStats = {}; // { Black: {t:100, p:90} }
+
+    Object.keys(uniqueLots).forEach(id => {
+        totalUniq++;
+        let obj = uniqueLots[id];
+        
+        // Color Analysis
+        let c = obj.color || 'Unknown';
+        if(!colorStats[c]) colorStats[c] = {t:0, p:0};
+        colorStats[c].t += obj.qty;
+        colorStats[c].p += obj.passQty;
+
+        if(obj.currentStatus === 'Pass'){
+            closed++;
+        } else {
+            // Open (Fail/Hold)
+            let txt = `${id} (Line ${obj.line})`;
+            if(obj.floor === 'Floor 1') openLots.f1.push(txt);
+            if(obj.floor === 'Floor 2') openLots.f2.push(txt);
+            if(obj.floor === 'Basement') openLots.fb.push(txt);
+        }
+    });
+
+    // Update UI
+    document.getElementById('kpi_uniq_lots').innerText = totalUniq;
+    document.getElementById('kpi_closed').innerText = closed;
+    document.getElementById('kpi_closure').innerText = totalUniq ? Math.round((closed/totalUniq)*100)+"%" : "0%";
+
+    const renderList = (id, arr) => document.getElementById(id).innerHTML = arr.length ? arr.map(i=>`<li class="list-group-item text-danger fw-bold">${i}</li>`).join('') : '<li class="list-group-item text-muted">No Open Lots</li>';
+    renderList('list_f1', openLots.f1);
+    renderList('list_f2', openLots.f2);
+    renderList('list_fb', openLots.fb);
+
+    // Color Table
+    let cHtml = "";
+    Object.keys(colorStats).forEach(c => {
+        let s = colorStats[c];
+        cHtml += `<tr><td>${c}</td><td>${s.t}</td><td>${s.p}</td><td>${s.t ? (s.p/s.t*100).toFixed(1) : 0}%</td></tr>`;
+    });
+    document.getElementById('colorTable').innerHTML = cHtml;
+}
+
+function renderTable(rows){
+    const tb = document.getElementById('masterTable');
+    tb.innerHTML = "";
+    // Show last 50 entries to keep it fast
+    let recent = rows.slice(-50).reverse(); 
+    
+    recent.forEach((r, i) => {
+        // Real index in sheetData is roughly (length - 1 - i)
+        let realIdx = rows.indexOf(r); 
+        
+        let color = r[8]==='Pass'?'text-success':'text-danger';
         let row = `<tr>
-            <td>${r.date}</td><td>Line ${r.line}</td><td>${r.model}</td>
-            <td>${r.lots.length}</td><td>${totalQty}</td><td>${overall}</td>
+            <td>${r[0]}</td><td>${r[1]}</td><td class="fw-bold">${r[5]}</td><td>${r[6]}</td>
+            <td class="${color} fw-bold">${r[8]}</td><td>${r[9]||'-'}</td>
             <td>
-                <button class="btn btn-sm btn-warning" onclick="editRec(${idx})">Edit</button>
-                <button class="btn btn-sm btn-danger" onclick="delRec(${idx})">Del</button>
+                <button class="btn btn-sm btn-primary" onclick="showPreview(${realIdx})">View</button>
+                <button class="btn btn-sm btn-warning" onclick="editRow(${realIdx})">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteRow(${realIdx})">Del</button>
             </td>
         </tr>`;
         tb.innerHTML += row;
     });
 }
 
-function editRec(idx){
-    let r = allData[idx];
-    document.getElementById('date').value = r.date;
-    document.getElementById('line').value = r.line;
-    detectFloor();
-    document.getElementById('model').value = r.model;
-    document.getElementById('color').value = r.color;
-    document.getElementById('lotContainer').innerHTML = "";
-    r.lots.forEach(l => addLotRow(l));
-    document.getElementById('editIndex').value = idx;
+// --- TRACEABILITY ---
+function traceLot(){
+    let id = document.getElementById('traceId').value.trim().toUpperCase();
+    if(!id) return;
+    
+    let history = sheetData.filter(r => r[5] === id);
+    let div = document.getElementById('traceResult');
+    
+    if(history.length === 0){
+        div.innerHTML = `<div class="alert alert-warning">Lot ID <b>${id}</b> Not Found!</div>`;
+        return;
+    }
+    
+    let html = `<h5 class="text-primary">History for Lot: ${id}</h5><table class="table table-sm table-bordered"><thead><tr><th>Date</th><th>Status</th><th>Result</th><th>Defect</th></tr></thead><tbody>`;
+    history.forEach(r => {
+        html += `<tr><td>${r[0]}</td><td>${r[7]}</td><td class="${r[8]==='Pass'?'text-success':'text-danger'} fw-bold">${r[8]}</td><td>${r[9]||'-'}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+    
+    // Check Status
+    let last = history[history.length-1];
+    let statusBadge = last[8]==='Pass' ? '<span class="status-badge bg-closed">CLOSED (Passed)</span>' : '<span class="status-badge bg-open">OPEN (Failed)</span>';
+    
+    div.innerHTML = statusBadge + html;
+}
+
+// --- ACTIONS ---
+function deleteRow(idx){
+    if(!confirm("Delete this record permanently?")) return;
+    fetch(API_URL, {method:'POST', body:JSON.stringify({action:'delete', rowIndex: idx})})
+    .then(r=>r.json()).then(d=>{ alert("Deleted"); loadDashboard(); });
+}
+
+function editRow(idx){
+    let r = sheetData[idx];
     switchTab('form');
+    document.getElementById('editRowIndex').value = idx;
+    
+    document.getElementById('date').value = r[0]; // Need proper date format yyyy-MM-dd
+    document.getElementById('line').value = r[1]; detectFloor();
+    document.getElementById('model').value = r[3];
+    document.getElementById('color').value = r[4];
+    
+    document.getElementById('lotContainer').innerHTML = "";
+    addLotRow(r); // Pass data to prefill
     window.scrollTo(0,0);
 }
 
-function delRec(idx){
-    if(confirm("Delete?")) {
-        allData.splice(idx, 1);
-        renderTable();
-    }
+function showPreview(idx){
+    let r = sheetData[idx];
+    let html = `<table class="table table-bordered">
+        <tr><th>Date</th><td>${r[0]}</td></tr>
+        <tr><th>Lot ID</th><td>${r[5]}</td></tr>
+        <tr><th>Line/Floor</th><td>Line ${r[1]} (${r[2]})</td></tr>
+        <tr><th>Result</th><td class="fw-bold ${r[8]==='Pass'?'text-success':'text-danger'}">${r[8]}</td></tr>
+        <tr><th>Defect</th><td>${r[9]}</td></tr>
+        <tr><th>Analysis</th><td>${r[12]}</td></tr>
+    </table>`;
+    document.getElementById('prevBody').innerHTML = html;
+    new bootstrap.Modal(document.getElementById('prevModal')).show();
 }
 
-// --- FAKE DATA FOR DEMO ---
-function loadFakeData(){
-    // Generating some history
-    for(let i=0; i<5; i++){
-        allData.push({
-            id: i, date: '2025-12-'+(14+i), line: (Math.floor(Math.random()*20)+1), floor: '1st Floor', 
-            model: 'Model A', color: 'Black',
-            lots: [
-                { id: 'L00'+i, qty: 1000, status: 'Fresh', result: 'Pass', d_qty:0 },
-                { id: 'L01'+i, qty: 500, status: 'Fresh', result: 'Fail', d_name: 'Sound Issue', d_qty: 20, d_stage:'FT', d_belong:'Earbuds', d_analysis:'Speaker loose' }
-            ]
-        });
-    }
-    renderTable();
-}
-
-// --- DASHBOARD LOGIC ---
-function loadDashboard(){
-    let start = document.getElementById('dashStart').value;
-    let end = document.getElementById('dashEnd').value;
-    
-    // Filter
-    let filtered = allData.filter(r => r.date >= start && r.date <= end);
-    
-    // Aggregates
-    let totalLots = 0, passedLots = 0;
-    let totalQty = 0, passedQty = 0; // (Total - Defect)
-    let dateMap = {}; // { date: { lots:0, passLots:0, qty:0, passQty:0 } }
-    let floorMap = {}; // { floor: { lots:0, passLots:0, qty:0, passQty:0 } }
-    let defectMap = {}; // { name: count }
-
-    filtered.forEach(r => {
-        let d = r.date;
-        let f = getFloorByLine(r.line);
-        if(!dateMap[d]) dateMap[d] = {l:0, pl:0, q:0, pq:0};
-        if(!floorMap[f]) floorMap[f] = {l:0, pl:0, q:0, pq:0};
-
-        r.lots.forEach(lot => {
-            totalLots++;
-            dateMap[d].l++; floorMap[f].l++;
-            
-            let q = lot.qty;
-            totalQty += q;
-            dateMap[d].q += q; floorMap[f].q += q;
-
-            if(lot.result === 'Pass'){
-                passedLots++;
-                dateMap[d].pl++; floorMap[f].pl++;
-                passedQty += q;
-                dateMap[d].pq += q; floorMap[f].pq += q;
-            } else {
-                // Fail
-                let goodQty = q - (lot.d_qty || 0);
-                passedQty += goodQty;
-                dateMap[d].pq += goodQty; floorMap[f].pq += goodQty;
-                
-                // Defects
-                if(lot.d_name) {
-                    if(!defectMap[lot.d_name]) defectMap[lot.d_name] = 0;
-                    defectMap[lot.d_name] += (lot.d_qty || 0);
-                }
-            }
-        });
-    });
-
-    // KPI
-    document.getElementById('kpi_lots').innerText = totalLots;
-    document.getElementById('kpi_qty').innerText = totalQty;
-    let lar = totalLots ? (passedLots/totalLots*100).toFixed(2) : 0;
-    let pr = totalQty ? (passedQty/totalQty*100).toFixed(2) : 0;
-    document.getElementById('kpi_lar').innerText = lar + "%";
-    document.getElementById('kpi_pass').innerText = pr + "%";
-
-    // 1. Trend Charts (Date Wise)
-    let chartDataQty = [['Date', 'Pass Rate % (Qty)']];
-    let chartDataLot = [['Date', 'LAR % (Lot)']];
-    
-    Object.keys(dateMap).sort().forEach(d => {
-        let stats = dateMap[d];
-        chartDataQty.push([d, stats.q ? (stats.pq/stats.q*100) : 0]);
-        chartDataLot.push([d, stats.l ? (stats.pl/stats.l*100) : 0]);
-    });
-    
-    drawTrend('chart_trend_qty', chartDataQty, 'Date-wise PDI Pass Rate Trend (Qty)');
-    drawTrend('chart_trend_lot', chartDataLot, 'Date-wise LAR Trend (Lot)', '#28a745');
-
-    // 2. Floor Charts
-    let floorLarData = [['Floor', 'LAR %']];
-    let floorPassData = [['Floor', 'Pass Rate %']];
-    ['1st Floor', '2nd Floor', 'Basement'].forEach(f => {
-        let s = floorMap[f] || {l:0, pl:0, q:0, pq:0};
-        floorLarData.push([f, s.l ? (s.pl/s.l*100) : 0]);
-        floorPassData.push([f, s.q ? (s.pq/s.q*100) : 0]);
-    });
-    drawBar('chart_floor_lar', floorLarData, 'Floor Wise LAR %');
-    drawBar('chart_floor_pass', floorPassData, 'Floor Wise Pass Rate % (Qty)', '#17a2b8');
-
-    // 3. Pareto & Action Plan
-    let defectsArr = Object.keys(defectMap).map(k => ({name:k, qty:defectMap[k]}));
-    defectsArr.sort((a,b) => b.qty - a.qty);
-    let top5 = defectsArr.slice(0, 5);
-    
-    let paretoData = [['Defect', 'Qty']];
-    let actionHtml = "";
-    
-    top5.forEach(d => {
-        paretoData.push([d.name, d.qty]);
-        actionHtml += `<tr><td>${d.name}</td><td>${d.qty}</td><td><textarea class="form-control form-control-sm" rows="1"></textarea></td></tr>`;
-    });
-    
-    if(top5.length === 0) { paretoData.push(['No Defects', 0]); actionHtml = "<tr><td colspan='3'>No Defects found in selected period</td></tr>"; }
-    
-    drawBar('chart_pareto', paretoData, 'Top 5 Defects (Pareto)', '#dc3545');
-    document.getElementById('actionPlanBody').innerHTML = actionHtml;
-}
-
-function getFloorByLine(l){
-    l = parseInt(l);
-    if(l <= 8) return "1st Floor";
-    if(l <= 16) return "2nd Floor";
-    return "Basement";
-}
-
-function drawTrend(id, data, title, color='#003366'){
-    let dt = google.visualization.arrayToDataTable(data);
-    let opt = { title: title, legend: { position: 'bottom' }, colors:[color], pointSize:5, vAxis:{minValue:0, maxValue:100} };
-    new google.visualization.LineChart(document.getElementById(id)).draw(dt, opt);
-}
-
-function drawBar(id, data, title, color='#003366'){
-    let dt = google.visualization.arrayToDataTable(data);
-    let opt = { title: title, legend: { position: 'none' }, colors:[color], vAxis:{minValue:0} };
-    new google.visualization.ColumnChart(document.getElementById(id)).draw(dt, opt);
-}
-
-// --- PPT GENERATION ---
-function downloadPPT() {
+function downloadPPT(){
     let pres = new PptxGenJS();
-    let logoUrl = "https://i.postimg.cc/5y7SN4xc/logo.png";
-
-    // Slide 1: Summary
-    let slide1 = pres.addSlide();
-    slide1.addImage({ path: logoUrl, x: 0.5, y: 0.2, w: 1.5, h: 0.5 });
-    slide1.addText("PDI PERFORMANCE REPORT", { x: 3, y: 0.4, fontSize: 24, bold: true, color: "003366" });
-    slide1.addText(`Period: ${document.getElementById('dashStart').value} to ${document.getElementById('dashEnd').value}`, { x: 3, y: 0.8, fontSize: 12 });
-
-    // Summary Table
-    let lar = document.getElementById('kpi_lar').innerText;
-    let pr = document.getElementById('kpi_pass').innerText;
-    let dataTable = [
-        [{ text: "Total Lots", options: { fill: "003366", color: "ffffff", bold: true } }, { text: "Total Qty", options: { fill: "003366", color: "ffffff", bold: true } }, { text: "LAR %", options: { fill: "003366", color: "ffffff", bold: true } }, { text: "Pass Rate %", options: { fill: "003366", color: "ffffff", bold: true } }],
-        [document.getElementById('kpi_lots').innerText, document.getElementById('kpi_qty').innerText, lar, pr]
-    ];
-    slide1.addTable(dataTable, { x: 0.5, y: 1.5, w: 9, align: "center" });
-
-    // Slide 2: Charts (Capturing Data, not images as HTML canvas capture is complex in pure JS without plugins)
-    // We will recreate basic text representation or placeholder for charts. 
-    // *Ideally, use html2canvas to convert divs to images and addImage to PPT*
-    // Here, I will add a text summary for the charts as placeholders are safer in pure code.
-    let slide2 = pres.addSlide();
-    slide2.addText("PERFORMANCE TRENDS", { x: 0.5, y: 0.5, fontSize: 18, bold: true, color: "003366" });
-    slide2.addText("Please refer to the Dashboard for interactive charts.", {x:0.5, y:1.5});
-    slide2.addText("Floor Wise Summary:", {x:0.5, y:2.5, bold:true});
-    // Add logic to dump floor map data here if needed.
-
-    // Slide 3: Action Plan
-    let slide3 = pres.addSlide();
-    slide3.addText("DEFECT ANALYSIS & ACTION PLAN", { x: 0.5, y: 0.5, fontSize: 18, bold: true, color: "DC3545" });
+    let slide = pres.addSlide();
+    slide.addText("PDI DASHBOARD REPORT", { x:1, y:1, fontSize:24, color:'003366', bold:true });
+    slide.addText(`Generated: ${new Date().toLocaleDateString()}`, { x:1, y:1.5, fontSize:12 });
     
-    // Scrape Action Plan Table
-    let actionRows = [[{ text: "Defect", bold:true}, {text:"Qty", bold:true}, {text:"Root Cause / Action", bold:true}]];
-    document.querySelectorAll('#actionPlanBody tr').forEach(tr => {
-        let tds = tr.querySelectorAll('td');
-        if(tds.length >= 3){
-            let txt = tds[2].querySelector('textarea') ? tds[2].querySelector('textarea').value : "";
-            actionRows.push([tds[0].innerText, tds[1].innerText, txt]);
-        }
-    });
-    slide3.addTable(actionRows, { x: 0.5, y: 1.5, w: 9, colW:[3, 1.5, 4.5], border:{color:"999999"} });
+    slide.addText(`Open Lots:`, { x:1, y:2.5, bold:true, color:'DC3545' });
+    slide.addText(`Floor 1: ${document.getElementById('list_f1').innerText}`, { x:1, y:3, fontSize:10 });
+    slide.addText(`Floor 2: ${document.getElementById('list_f2').innerText}`, { x:1, y:3.5, fontSize:10 });
     
-    let remarks = document.getElementById('generalAction').value;
-    if(remarks) slide3.addText(`Remarks: ${remarks}`, { x: 0.5, y: 5.0, fontSize:12 });
-
+    slide.addText(`Closure Rate: ${document.getElementById('kpi_closure').innerText}`, { x:5, y:2.5, bold:true, color:'28A745' });
+    
     pres.writeFile({ fileName: "PDI_Report.pptx" });
 }
-
 </script>
 
 </body>
