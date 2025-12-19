@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDI Master System - Updated</title>
+    <title>PDI Master System Pro</title>
     <!-- Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -11,263 +11,446 @@
     <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 
     <style>
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; font-size: 15px; }
-        .app-header { background: white; border-bottom: 5px solid #003366; padding: 15px 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .logo { height: 55px; }
-        .app-title { color: #003366; font-weight: 800; font-size: 24px; text-transform: uppercase; margin: 0; }
-        .nav-pills .nav-link { color: #555; font-weight: bold; border: 1px solid #ddd; margin-right: 5px; background: white; }
-        .nav-pills .nav-link.active { background-color: #003366; color: white; border-color: #003366; }
-        .card { border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; }
-        .card-header { background: #003366; color: white; font-weight: bold; padding: 12px 15px; border-radius: 8px 8px 0 0 !important; }
-        .table thead { background-color: #343a40; color: white; }
-        .kpi-box { background: white; padding: 20px; border-radius: 8px; border-left: 6px solid #003366; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .kpi-val { font-size: 32px; font-weight: bold; color: #333; }
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 20px; color: #003366; font-weight: bold; display: none; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; }
+        .app-header { background: #003366; color: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .logo { height: 50px; filter: brightness(0) invert(1); }
+        .nav-pills .nav-link { color: white; border: 1px solid rgba(255,255,255,0.3); margin-right: 5px; }
+        .nav-pills .nav-link.active { background-color: #ffc107; color: #000; border-color: #ffc107; }
+        .card { border: none; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card-header { background: #003366; color: white; font-weight: bold; border-radius: 10px 10px 0 0 !important; }
+        .kpi-box { background: white; padding: 15px; border-radius: 10px; border-top: 4px solid #003366; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .kpi-val { font-size: 28px; font-weight: 800; color: #003366; }
+        .kpi-label { font-size: 11px; text-transform: uppercase; color: #666; font-weight: bold; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; display: none; }
+        .timeline-item { border-left: 3px solid #003366; padding: 10px 20px; position: relative; margin-left: 10px; }
+        .timeline-item::before { content: ''; width: 12px; height: 12px; background: white; border: 3px solid #003366; border-radius: 50%; position: absolute; left: -8px; top: 15px; }
+        .pass-row { border-left: 5px solid #28a745; }
+        .fail-row { border-left: 5px solid #dc3545; }
     </style>
 </head>
 <body>
 
-<div id="loader">Processing Data...</div>
+<div id="loader">
+    <div class="spinner-border text-primary" role="status"></div>
+    <div class="mt-2 fw-bold">Syncing with Google Sheets...</div>
+</div>
 
 <div class="app-header">
     <div class="d-flex align-items-center gap-3">
-        <img src="https://i.postimg.cc/5y7SN4xc/logo.png" class="logo">
-        <h1 class="app-title">PDI Master System</h1>
+        <img src="https://i.postimg.cc/5y7SN4xc/logo.png" class="logo" alt="Logo">
+        <h4 class="m-0 fw-bold">PDI MASTER SYSTEM</h4>
     </div>
-    <div class="nav nav-pills">
-        <button class="nav-link active" onclick="switchTab('form')">📝 Data Entry</button>
-        <button class="nav-link" onclick="switchTab('dashboard')">📊 Dashboard</button>
-        <button class="nav-link" onclick="switchTab('closure')">🔐 Closure</button>
+    <div class="nav nav-pills" id="mainTabs">
+        <button class="nav-link active" onclick="switchTab('form', this)">📝 Data Entry</button>
+        <button class="nav-link" onclick="switchTab('dashboard', this)">📊 Dashboard</button>
+        <button class="nav-link" onclick="switchTab('closure', this)">🔐 Closure & Trace</button>
     </div>
 </div>
 
-<div class="container-fluid mt-4">
+<div class="container-fluid mt-4 pb-5">
 
-    <!-- DATA ENTRY TAB -->
+    <!-- 1. DATA ENTRY TAB -->
     <div id="tab-form">
         <form id="pdiForm">
-            <input type="hidden" id="editRowIndex"> 
-            <div class="card">
-                <div class="card-header">General Information</div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-3"><label class="fw-bold">Date</label><input type="date" id="date" class="form-control" required></div>
+            <input type="hidden" id="editRowIndex">
+            
+            <div class="card mb-3">
+                <div class="card-body py-2">
+                    <div class="row align-items-center">
                         <div class="col-md-3">
-                            <label class="fw-bold">Line</label>
-                            <select id="line" class="form-select" onchange="detectFloor()" required><option value="">Select Line</option></select>
+                            <label class="fw-bold">Report Date</label>
+                            <input type="date" id="reportDate" class="form-control" required>
                         </div>
-                        <div class="col-md-3"><label class="fw-bold">Model</label><select id="model" class="form-select"></select></div>
-                        <div class="col-md-3"><label class="fw-bold">Color</label><select id="color" class="form-select"></select></div>
+                        <div class="col-md-9 text-end pt-3">
+                            <button type="button" class="btn btn-primary" onclick="addLotRow()">+ Add New Lot Entry</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-header d-flex justify-content-between">
-                    <span>Lot Details</span>
-                    <button type="button" class="btn btn-sm btn-light" onclick="addLotRow()">+ Add Lot</button>
-                </div>
+                <div class="card-header">Lot Details (Dynamic Entry)</div>
                 <div class="table-responsive">
-                    <table class="table table-bordered mb-0">
-                        <thead class="table-light">
-                            <tr><th>Lot ID</th><th>Qty</th><th>Status</th><th>Result</th><th>Defects</th><th>Action</th></tr>
+                    <table class="table table-bordered align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr style="font-size: 12px;">
+                                <th width="10%">Line</th>
+                                <th width="15%">Model</th>
+                                <th width="15%">Colour</th>
+                                <th width="10%">Lot ID</th>
+                                <th width="8%">Qty</th>
+                                <th width="10%">Status</th>
+                                <th width="10%">Result</th>
+                                <th>Defect / Remarks</th>
+                                <th width="5%"></th>
+                            </tr>
                         </thead>
                         <tbody id="lotContainer"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div class="text-end mb-4">
-                <button type="button" class="btn btn-secondary" onclick="resetForm()">Clear</button>
-                <button type="submit" id="saveBtn" class="btn btn-success px-5">Save Data</button>
+            <div class="text-end mt-3">
+                <button type="button" class="btn btn-secondary me-2" onclick="resetForm()">Clear Form</button>
+                <button type="submit" id="saveBtn" class="btn btn-success px-5 fw-bold">SAVE TO SHEET</button>
             </div>
         </form>
 
-        <!-- RECENT RECORDS TABLE -->
-        <div class="card">
-            <div class="card-header bg-dark text-white">Recent Records (Latest 50 Entries)</div>
-            <div class="card-body p-0">
-                <div class="table-responsive" style="max-height: 500px;">
-                    <table class="table table-hover table-striped text-center align-middle">
-                        <thead class="table-secondary sticky-top">
-                            <tr>
-                                <th>Date</th><th>Line</th><th>Model</th><th>Lot ID</th><th>Result</th><th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="crudTable">
-                            <tr><td colspan="6" class="text-muted">Loading records...</td></tr>
-                        </tbody>
-                    </table>
+        <div class="card mt-4">
+            <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+                <span>Recent Records (Latest 50)</span>
+                <button class="btn btn-sm btn-outline-light" onclick="loadAllData()">🔄 Refresh</button>
+            </div>
+            <div class="table-responsive" style="max-height: 400px;">
+                <table class="table table-sm table-hover text-center">
+                    <thead class="table-secondary sticky-top">
+                        <tr><th>Date</th><th>Line</th><th>Model</th><th>Lot ID</th><th>Qty</th><th>Result</th><th>Action</th></tr>
+                    </thead>
+                    <tbody id="crudTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. DASHBOARD TAB -->
+    <div id="tab-dashboard" style="display:none;">
+        <div class="row g-3 mb-4">
+            <div class="col-md-3"><div class="kpi-box"><div class="kpi-label">Total Lots</div><div class="kpi-val" id="k_lots">0</div></div></div>
+            <div class="col-md-3"><div class="kpi-box"><div class="kpi-label">Total Qty</div><div class="kpi-val" id="k_qty">0</div></div></div>
+            <div class="col-md-3"><div class="kpi-box" style="border-top-color:#28a745"><div class="kpi-label">LAR % (Lot)</div><div class="kpi-val text-success" id="k_lar">0%</div></div></div>
+            <div class="col-md-3"><div class="kpi-box" style="border-top-color:#17a2b8"><div class="kpi-label">Pass Rate % (Qty)</div><div class="kpi-val text-info" id="k_pass">0%</div></div></div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6"><div class="card"><div class="card-header">Date-wise Pass Rate Trend</div><div class="card-body"><div id="ch_trend" style="height:300px"></div></div></div></div>
+            <div class="col-md-6"><div class="card"><div class="card-header">Floor Performance (Pass %)</div><div class="card-body"><div id="ch_floor" style="height:300px"></div></div></div></div>
+            <div class="col-md-12"><div class="card"><div class="card-header">Defect Pareto (Top 10)</div><div class="card-body"><div id="ch_pareto" style="height:300px"></div></div></div></div>
+        </div>
+    </div>
+
+    <!-- 3. CLOSURE TAB -->
+    <div id="tab-closure" style="display:none;">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary">Trace Lot History</div>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <input type="text" id="trInput" class="form-control" placeholder="Search Lot ID...">
+                            <button class="btn btn-primary" onclick="traceLot()">Trace</button>
+                        </div>
+                        <div id="traceResult"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card h-100">
+                    <div class="card-header bg-warning text-dark">Open / Pending Lots (Action Required)</div>
+                    <div class="card-body p-0">
+                        <div class="row m-0 border-bottom bg-light fw-bold p-2 text-center">
+                            <div class="col-4 border-end">Floor 1</div>
+                            <div class="col-4 border-end">Floor 2</div>
+                            <div class="col-4">Basement</div>
+                        </div>
+                        <div class="row m-0" style="min-height: 300px;">
+                            <div class="col-4 border-end p-2" id="open_f1"></div>
+                            <div class="col-4 border-end p-2" id="open_f2"></div>
+                            <div class="col-4 p-2" id="open_fb"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- DASHBOARD & CLOSURE TABS (Keep existing structures) -->
-    <div id="tab-dashboard" style="display:none;">
-        <h3 class="text-center mt-5">Dashboard Analytics Loaded...</h3>
-        <!-- Existing charts code can stay here -->
-    </div>
-    <div id="tab-closure" style="display:none;">
-         <h3 class="text-center mt-5">Lot Closure Traceability...</h3>
-    </div>
-
 </div>
 
 <script>
-// REPLACE WITH YOUR URL
-const API_URL = "https://script.google.com/macros/s/AKfycbyKy7X0OWvjeMSVpM36HGH3fVE_XQQ8alDUbhh1msX9gjVPHBtGvdvgkuOefSGfSRX7/exec"; 
+// ==========================================
+// 1. CONFIG & DATA
+// ==========================================
+const API_URL = "https://script.google.com/macros/s/AKfycbyKy7X0OWvjeMSVpM36HGH3fVE_XQQ8alDUbhh1msX9gjVPHBtGvdvgkuOefSGfSRX7/exec";
 
-const MODELS = ["Ad Unity ANC", "Ace", "Ad 111v2", "Ad 118", "Ad 120", "Ad 121Pro Plus", "Ad 131 Elite Anc", "Ad 131 Gen 2", "Ad 131 Pro Buds", "Ad 138 Gen 2", "Ad 141 Anc", "Ad 141 Anc Elite", "Ad 141 Gen 2", "Ad 141 Pro Buds", "Ad 148 Gen 2", "Ad 155", "Ad 161 Anc", "Ad 161 Anc Elite", "Ad 161 N", "Ad 181 Pro", "Ad 191 Anc", "Ad 192", "Ad 212", "Ad 213", "Ad 280 Anc", "Ad 300", "Ad 301", "Ad 311 Pro", "Ad 313", "AD 71", "Ad 800", "Ad 800 Hidef", "Ad 91", "Ad 91 Prime", "Ad Ace Gen 2", "Ad Alpha Gen 2", "AD Hype", "AD Kick", "Ad Nirvana Crystal", "Ad Nirvana Iris", "Ad Nirvana X", "Ad Plus 311", "Ad Plus 318", "Ad Prime 412", "Ad Prime 513 Anc", "Ad Primo", "Ad Pulse", "Ad Supreme", "Ad Ultra Pro", "Ad100", "Ad121 Pro", "Ad125", "Ad131", "Ad131 Pro", "Ad138", "Ad138 Pro", "Ad141", "Ad148", "Ad161", "AD161 Pro-Buds", "AD163", "AD170", "AD181", "AD183", "AD190", "AD191 G", "Airdopes 207", "Alpha", "Amazon basics", "Atom 81 Pro", "Atom 83", "Atom81", "HMD P50", "HMD P60", "HMD P70", "HMD S60", "HMD X50", "HMD X50 Pro", "IMT 100", "IMT101", "IMT121", "IMT128", "IMT131", "IMT161", "IMT181", "Joy", "Max", "Nirvana", "Nirvana Ion (ANC)", "Nirvana ION ANC Pro", "Nirvana ION N Mold", "R 195 Pro", "Ultra Plus", "Zing"];
+const MODELS = ["Ad Unity ANC","Ace","Ad 111v2","Ad 118","Ad 120","Ad 121Pro Plus","Ad 131 Elite Anc","Ad 131 Gen 2","Ad 131 Pro Buds","Ad 138 Gen 2","Ad 141 Anc","Ad 141 Anc Elite","Ad 141 Gen 2","Ad 141 Pro Buds","Ad 148 Gen 2","Ad 155","Ad 161 Anc","Ad 161 Anc Elite","Ad 161 N","Ad 181 Pro","Ad 191 Anc","Ad 192","Ad 212","Ad 213","Ad 280 Anc","Ad 300","Ad 301","Ad 311 Pro","Ad 313","AD 71","Ad 800","Ad 800 Hidef","Ad 91","Ad 91 Prime","Ad Ace Gen 2","Ad Alpha Gen 2","AD Hype","AD Kick","Ad Nirvana Crystal","Ad Nirvana Iris","Ad Nirvana X","Ad Plus 311","Ad Plus 318","Ad Prime 412","Ad Prime 513 Anc","Ad Primo","Ad Pulse","Ad Supreme","Ad Ultra Pro","Ad100","Ad121 Pro","Ad125","Ad131","Ad131 Pro","Ad138","Ad138 Pro","Ad141","Ad148","Ad161","AD161 Pro-Buds","AD163","AD170","AD181","AD183","AD190","AD191 G","Airdopes 207","Alpha","Amazon basics","Atom 81 Pro","Atom 83","Atom81","HMD P50","HMD P60","HMD P70","HMD S60","HMD X50","HMD X50 Pro","IMT 100","IMT101","IMT121","IMT128","IMT131","IMT161","IMT181","Joy","Max","Nirvana","Nirvana Ion (ANC)","Nirvana ION ANC Pro","Nirvana ION N Mold","R 195 Pro","Ultra Plus","Zing"];
 
-const COLOURS = ["Black", "Blue", "Bold Blue", "Crimson Cream", "Graphite Grey", "Ivory White", "Krypton Blue", "Lavender Rush", "Moon White", "Pine Green", "Space Grey", "Sterling Silver", "White", "Zinc White", "Active Black", "Active Teal", "Active White", "Aero Blue", "Aqua Blue", "Arctic Whisper", "Ash Grey", "Assassin Black", "Assassin Red", "Azure Blue", "Berry Blue", "Black Sabre", "Blazing Comet", "Blazing Red", "Captain's Blue", "Carbon Black", "CarbonBlack", "Charcoal Black", "Cherry Blossom", "Chrome White", "Coco Brown", "Cool Grey", "Cool sapphire", "Coral Bloom", "Cosmic Onyx", "Cream White", "Crimsom Red", "Crystal Black", "Cyan cider", "Dark Cyan", "Dawn Blue", "Deep Blue", "Dusk Blue", "Electric Blue", "Emerald Green", "Fiery Black", "Frost White", "Frosted Mint", "Galactic Purple", "Galactic Red", "Gold Mist", "Green", "Green Cyan", "Green Fury", "Green giant", "Grey", "Gunmetal Black", "Hot Rouge", "Ice Blue", "Iron's Blood", "Ivory", "Ivory Elegance", "Ivory Glow", "Jade Green", "Jet Black", "Kinght Black", "King's Black", "Lilac Serenity", "Lunar White", "Maroon Lush", "Martian Green", "Metallic Grey", "Midnight Black", "Midnight Blue", "Midnight Shadow", "Mint Blue", "Mint Bubblegum", "Mint Cascade", "Mist Blue", "Mist Grey", "Mocha Elegance", "Mystic Blue", "Noir Black", "Northern Lights", "Obsidian Black", "Obsidian Noir", "Ocean Blue", "Olive Green", "Olive Slate", "Opal Black", "Orange", "Peach Blush", "Peach Dusk", "Pearl White", "Pellucid Blue", "Pellucid Green", "Pellucid Orange", "Pellucid Red", "Pellucid White", "Purple", "Quantum Black", "Quartz White", "Red", "Rose Quartz", "Saga Green", "Sahara Chic", "Sandstone", "Serene Green", "Shadow Black", "Silver", "Slate Blue", "Slate Fusion", "Slate Grey", "Sleek Black", "Smoky Amethyst", "Sonic Silver", "Spider-Man", "Spirit White", "Sporty Blue", "Starry Blue", "Sunset Blush", "Surfer Silver", "Swedish White", "Teal", "Thunder Blue", "Velvet Rouge", "White Lustre", "Yellow Pop"];
+const COLOURS = ["Black","Blue","Bold Blue","Crimson Cream","Graphite Grey","Ivory White","Krypton Blue","Lavender Rush","Moon White","Pine Green","Space Grey","Sterling Silver","White","Zinc White","Active Black","Active Teal","Active White","Aero Blue","Aqua Blue","Arctic Whisper","Ash Grey","Assassin Black","Assassin Red","Azure Blue","Berry Blue","Black Sabre","Blazing Comet","Blazing Red","Captain's Blue","Carbon Black","CarbonBlack","Charcoal Black","Cherry Blossom","Chrome White","Coco Brown","Cool Grey","Cool sapphire","Coral Bloom","Cosmic Onyx","Cream White","Crimsom Red","Crystal Black","Cyan cider","Dark Cyan","Dawn Blue","Deep Blue","Dusk Blue","Electric Blue","Emerald Green","Fiery Black","Frost White","Frosted Mint","Galactic Purple","Galactic Red","Gold Mist","Green","Green Cyan","Green Fury","Green giant","Grey","Gunmetal Black","Hot Rouge","Ice Blue","Iron's Blood","Ivory","Ivory Elegance","Ivory Glow","Jade Green","Jet Black","Kinght Black","King's Black","Lilac Serenity","Lunar White","Maroon Lush","Martian Green","Metallic Grey","Midnight Black","Midnight Blue","Midnight Shadow","Mint Blue","Mint Bubblegum","Mint Cascade","Mist Blue","Mist Grey","Mocha Elegance","Mystic Blue","Noir Black","Northern Lights","Obsidian Black","Obsidian Noir","Ocean Blue","Olive Green","Olive Slate","Opal Black","Orange","Peach Blush","Peach Dusk","Pearl White","Pellucid Blue","Pellucid Green","Pellucid Orange","Pellucid Red","Pellucid White","Purple","Quantum Black","Quartz White","Red","Rose Quartz","Saga Green","Sahara Chic","Sandstone","Serene Green","Shadow Black","Silver","Slate Blue","Slate Fusion","Slate Grey","Sleek Black","Smoky Amethyst","Sonic Silver","Spider-Man","Spirit White","Sporty Blue","Starry Blue","Sunset Blush","Surfer Silver","Swedish White","Teal","Thunder Blue","Velvet Rouge","White Lustre","Yellow Pop"];
 
 let sheetData = [];
+google.charts.load('current', {'packages':['corechart']});
 
 window.onload = function() {
-    // Populate Dropdowns
-    let mSel = document.getElementById('model');
-    MODELS.forEach(m => mSel.add(new Option(m, m)));
-    let cSel = document.getElementById('color');
-    COLOURS.forEach(c => cSel.add(new Option(c, c)));
-    let lSel = document.getElementById('line');
-    for(let i=1; i<=21; i++) lSel.add(new Option("Line "+i, i));
-
-    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
     addLotRow();
     loadAllData();
 };
 
-function addLotRow(data = null){
+function switchTab(tab, btn) {
+    ['form','dashboard','closure'].forEach(t => document.getElementById('tab-'+t).style.display = 'none');
+    document.getElementById('tab-'+tab).style.display = 'block';
+    
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    btn.classList.add('active');
+    
+    if(tab === 'dashboard') drawCharts();
+    if(tab === 'closure') processClosure();
+}
+
+// ==========================================
+// 2. FORM LOGIC
+// ==========================================
+function addLotRow(data = null) {
     const tr = document.createElement('tr');
-    tr.className = 'lot-row';
+    tr.className = 'lot-row-entry';
+    
+    // Line Options
+    let lineOpts = '<option value="">-</option>';
+    for(let i=1;i<=21;i++) lineOpts += `<option value="${i}">L${i}</option>`;
+    
+    // Model Options
+    let modelOpts = '<option value="">Select Model</option>';
+    MODELS.forEach(m => modelOpts += `<option value="${m}">${m}</option>`);
+    
+    // Colour Options
+    let colourOpts = '<option value="">Select Colour</option>';
+    COLOURS.forEach(c => colourOpts += `<option value="${c}">${c}</option>`);
+
     tr.innerHTML = `
-        <td><input type="text" class="form-control l-id" placeholder="LOT ID" required></td>
-        <td><input type="number" class="form-control l-qty" required></td>
-        <td><select class="form-select l-status"><option>Fresh</option><option>Rework</option></select></td>
-        <td><select class="form-select l-res" onchange="toggleDef(this)"><option value="Pass">Pass</option><option value="Fail">Fail</option></select></td>
-        <td><input type="text" class="form-control d-details" placeholder="Defect details if fail" disabled></td>
-        <td><button type="button" class="btn btn-danger" onclick="this.closest('tr').remove()">X</button></td>
+        <td><select class="form-select form-select-sm l-line" required>${lineOpts}</select></td>
+        <td><select class="form-select form-select-sm l-model" required>${modelOpts}</select></td>
+        <td><select class="form-select form-select-sm l-color" required>${colourOpts}</select></td>
+        <td><input type="text" class="form-control form-control-sm l-id" placeholder="LOT ID" required style="text-transform:uppercase;"></td>
+        <td><input type="number" class="form-control form-control-sm l-qty" placeholder="Qty" required></td>
+        <td><select class="form-select form-select-sm l-status"><option>Fresh</option><option>Rework</option><option>Market</option></select></td>
+        <td>
+            <select class="form-select form-select-sm l-res fw-bold" onchange="toggleDefectRow(this)">
+                <option value="Pass" class="text-success">Pass</option>
+                <option value="Fail" class="text-danger">Fail</option>
+            </select>
+        </td>
+        <td><input type="text" class="form-control form-control-sm l-defect" placeholder="If Fail, enter defect" disabled></td>
+        <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()">X</button></td>
     `;
+    
     document.getElementById('lotContainer').appendChild(tr);
-    if(data){
+
+    if(data) {
+        tr.querySelector('.l-line').value = data[1];
+        tr.querySelector('.l-model').value = data[3];
+        tr.querySelector('.l-color').value = data[4];
         tr.querySelector('.l-id').value = data[5];
         tr.querySelector('.l-qty').value = data[6];
         tr.querySelector('.l-status').value = data[7];
         tr.querySelector('.l-res').value = data[8];
-        if(data[8]==='Fail'){
-            tr.querySelector('.d-details').disabled = false;
-            tr.querySelector('.d-details').value = data[9];
+        if(data[8] === 'Fail') {
+            tr.querySelector('.l-defect').disabled = false;
+            tr.querySelector('.l-defect').value = data[9];
         }
     }
 }
 
-function toggleDef(sel){
-    sel.closest('tr').querySelector('.d-details').disabled = (sel.value === 'Pass');
+function toggleDefectRow(sel) {
+    const input = sel.closest('tr').querySelector('.l-defect');
+    input.disabled = (sel.value === 'Pass');
+    if(sel.value === 'Pass') input.value = "";
 }
 
-async function loadAllData(){
+document.getElementById('pdiForm').onsubmit = async (e) => {
+    e.preventDefault();
+    if(!API_URL.includes("script.google")) { alert("Invalid API URL!"); return; }
+    
+    document.getElementById('loader').style.display = 'flex';
+    const date = document.getElementById('reportDate').value;
+    const editIdx = document.getElementById('editRowIndex').value;
+    
+    let rowsToSave = [];
+    document.querySelectorAll('.lot-row-entry').forEach(tr => {
+        const line = tr.querySelector('.l-line').value;
+        const floor = (line <= 8) ? "Floor 1" : (line <= 16) ? "Floor 2" : "Basement";
+        
+        rowsToSave.push([
+            date, 
+            line, 
+            floor, 
+            tr.querySelector('.l-model').value, 
+            tr.querySelector('.l-color').value, 
+            tr.querySelector('.l-id').value.toUpperCase(), 
+            tr.querySelector('.l-qty').value, 
+            tr.querySelector('.l-status').value, 
+            tr.querySelector('.l-res').value, 
+            tr.querySelector('.l-defect').value || ""
+        ]);
+    });
+
+    let payload = { action: 'save', data: rowsToSave };
+    if(editIdx) payload = { action: 'edit', rowIndex: editIdx, data: rowsToSave[0] };
+
+    try {
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        alert("Data Sync Successful!");
+        resetForm();
+        await loadAllData();
+    } catch(err) { alert("Error saving data!"); }
+    document.getElementById('loader').style.display = 'none';
+};
+
+function resetForm() {
+    document.getElementById('pdiForm').reset();
+    document.getElementById('editRowIndex').value = "";
+    document.getElementById('lotContainer').innerHTML = "";
+    document.getElementById('saveBtn').innerText = "SAVE TO SHEET";
+    document.getElementById('saveBtn').className = "btn btn-success px-5 fw-bold";
+    addLotRow();
+}
+
+// ==========================================
+// 3. DATA & CRUD
+// ==========================================
+async function loadAllData() {
     document.getElementById('loader').style.display = 'flex';
     try {
-        let res = await fetch(API_URL);
-        let json = await res.json();
+        const res = await fetch(API_URL);
+        const json = await res.json();
         sheetData = json.data;
-        if(sheetData[0][0] === "Date") sheetData.shift(); // Header remove
-        renderTable();
-    } catch(e) { console.error("Error loading:", e); }
+        if(sheetData[0] && sheetData[0][0] === "Date") sheetData.shift(); 
+        
+        renderRecentTable();
+        // Trigger calc if dashboard open
+        if(document.getElementById('tab-dashboard').style.display !== 'none') drawCharts();
+    } catch(e) { console.error(e); }
     document.getElementById('loader').style.display = 'none';
 }
 
-function renderTable(){
-    const tbody = document.getElementById('crudTable');
-    tbody.innerHTML = "";
+function renderRecentTable() {
+    const tb = document.getElementById('crudTable');
+    tb.innerHTML = "";
     
-    // Reverse taaki latest pehle dikhe
-    let displayData = [...sheetData].reverse().slice(0, 50);
-    
-    displayData.forEach((row) => {
-        let realIndex = sheetData.indexOf(row);
-        let rowHtml = `<tr>
-            <td>${row[0].split('T')[0]}</td>
-            <td>Line ${row[1]}</td>
-            <td>${row[3]}</td>
-            <td><strong>${row[5]}</strong></td>
-            <td><span class="badge ${row[8]==='Pass'?'bg-success':'bg-danger'}">${row[8]}</span></td>
+    const display = [...sheetData].reverse().slice(0, 50);
+    display.forEach(r => {
+        let realIdx = sheetData.indexOf(r);
+        let dt = r[0].split('T')[0];
+        tb.innerHTML += `<tr>
+            <td>${dt}</td><td>L${r[1]}</td><td>${r[3]}</td><td><b>${r[5]}</b></td><td>${r[6]}</td>
+            <td><span class="badge ${r[8]==='Pass'?'bg-success':'bg-danger'}">${r[8]}</span></td>
             <td>
-                <button class="btn btn-sm btn-outline-primary" onclick="editRow(${realIndex})">Edit</button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteRow(${realIndex})">Del</button>
+                <button class="btn btn-sm btn-outline-primary" onclick="editRecord(${realIdx})">✏️</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord(${realIdx})">🗑️</button>
             </td>
         </tr>`;
-        tbody.innerHTML += rowHtml;
     });
 }
 
-function editRow(idx){
-    let row = sheetData[idx];
+function editRecord(idx) {
+    const r = sheetData[idx];
+    switchTab('form', document.querySelector('[onclick*="form"]'));
     document.getElementById('editRowIndex').value = idx;
-    document.getElementById('date').value = row[0].split('T')[0];
-    document.getElementById('line').value = row[1];
-    document.getElementById('model').value = row[3];
-    document.getElementById('color').value = row[4];
-    
+    document.getElementById('reportDate').value = r[0].split('T')[0];
     document.getElementById('lotContainer').innerHTML = "";
-    addLotRow(row);
+    addLotRow(r);
     
-    document.getElementById('saveBtn').innerText = "Update Record";
-    document.getElementById('saveBtn').className = "btn btn-warning px-5";
+    document.getElementById('saveBtn').innerText = "UPDATE RECORD";
+    document.getElementById('saveBtn').className = "btn btn-warning px-5 fw-bold";
     window.scrollTo(0,0);
 }
 
-async function deleteRow(idx){
-    if(!confirm("Are you sure you want to delete this record?")) return;
+async function deleteRecord(idx) {
+    if(!confirm("Are you sure?")) return;
     document.getElementById('loader').style.display = 'flex';
     await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', rowIndex: idx }) });
     loadAllData();
 }
 
-document.getElementById('pdiForm').onsubmit = async (e) => {
-    e.preventDefault();
-    document.getElementById('loader').style.display = 'flex';
-    
-    let editIdx = document.getElementById('editRowIndex').value;
-    let entries = [];
-    document.querySelectorAll('.lot-row').forEach(tr => {
-        entries.push([
-            document.getElementById('date').value,
-            document.getElementById('line').value,
-            "Floor Auto", // Placeholder logic
-            document.getElementById('model').value,
-            document.getElementById('color').value,
-            tr.querySelector('.l-id').value,
-            tr.querySelector('.l-qty').value,
-            tr.querySelector('.l-status').value,
-            tr.querySelector('.l-res').value,
-            tr.querySelector('.d-details').value
-        ]);
+// ==========================================
+// 4. DASHBOARD & CLOSURE LOGIC
+// ==========================================
+function drawCharts() {
+    if(!sheetData.length) return;
+
+    let totLots=0, totQty=0, passLots=0, passQty=0;
+    let dateData = {}, floorData = {"Floor 1":{p:0,t:0}, "Floor 2":{p:0,t:0}, "Basement":{p:0,t:0}};
+    let defects = {};
+
+    sheetData.forEach(r => {
+        let d = r[0].split('T')[0];
+        let fl = r[2] || "Floor 1";
+        let q = parseInt(r[6]||0);
+        let res = r[8];
+
+        totLots++; totQty += q;
+        if(!dateData[d]) dateData[d] = {p:0, t:0};
+        dateData[d].t += q;
+
+        if(res === 'Pass') {
+            passLots++; passQty += q;
+            dateData[d].p += q;
+            if(floorData[fl]) floorData[fl].p += q;
+        }
+        if(floorData[fl]) floorData[fl].t += q;
+        if(r[9]) defects[r[9]] = (defects[r[9]]||0) + 1;
     });
 
-    let payload = editIdx ? { action: 'edit', rowIndex: editIdx, data: entries[0] } : { action: 'save', data: entries };
-    
-    await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-    resetForm();
-    loadAllData();
-};
+    document.getElementById('k_lots').innerText = totLots;
+    document.getElementById('k_qty').innerText = totQty;
+    document.getElementById('k_lar').innerText = ((passLots/totLots)*100).toFixed(1) + "%";
+    document.getElementById('k_pass').innerText = ((passQty/totQty)*100).toFixed(1) + "%";
 
-function resetForm(){
-    document.getElementById('pdiForm').reset();
-    document.getElementById('editRowIndex').value = "";
-    document.getElementById('lotContainer').innerHTML = "";
-    document.getElementById('saveBtn').innerText = "Save Data";
-    document.getElementById('saveBtn').className = "btn btn-success px-5";
-    addLotRow();
+    // Chart 1: Trend
+    let trendArr = [['Date', 'Pass %']];
+    Object.keys(dateData).sort().forEach(k => trendArr.push([k, (dateData[k].p/dateData[k].t)*100]));
+    new google.visualization.LineChart(document.getElementById('ch_trend')).draw(google.visualization.arrayToDataTable(trendArr), {legend:'none', colors:['#003366'], curveType:'function'});
+
+    // Chart 2: Floor
+    let floorArr = [['Floor', 'Pass %']];
+    Object.keys(floorData).forEach(f => floorArr.push([f, (floorData[f].p/floorData[f].t)*100 || 0]));
+    new google.visualization.ColumnChart(document.getElementById('ch_floor')).draw(google.visualization.arrayToDataTable(floorArr), {legend:'none', colors:['#17a2b8']});
+
+    // Chart 3: Pareto
+    let defArr = [['Defect', 'Freq']];
+    Object.keys(defects).sort((a,b)=>defects[b]-defects[a]).slice(0,10).forEach(k => defArr.push([k, defects[k]]));
+    if(defArr.length === 1) defArr.push(['No Data', 0]);
+    new google.visualization.BarChart(document.getElementById('ch_pareto')).draw(google.visualization.arrayToDataTable(defArr), {legend:'none', colors:['#dc3545']});
 }
 
-function switchTab(tab){
-    ['form','dashboard','closure'].forEach(t => document.getElementById('tab-'+t).style.display = 'none');
-    document.getElementById('tab-'+tab).style.display = 'block';
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    event.target.classList.add('active');
+function processClosure() {
+    let lots = {};
+    sheetData.forEach(r => {
+        let id = r[5];
+        if(!lots[id]) lots[id] = {history:[], lastRes:'', floor:''};
+        lots[id].history.push(r);
+        lots[id].lastRes = r[8];
+        lots[id].floor = r[2];
+    });
+
+    const f1 = document.getElementById('open_f1'), f2 = document.getElementById('open_f2'), fb = document.getElementById('open_fb');
+    f1.innerHTML = ""; f2.innerHTML = ""; fb.innerHTML = "";
+
+    Object.keys(lots).forEach(id => {
+        if(lots[id].lastRes !== 'Pass') {
+            let item = `<div class="p-1 mb-1 bg-white border rounded small"><b>${id}</b> (${lots[id].history[lots[id].history.length-1][3]})</div>`;
+            if(lots[id].floor === 'Floor 1') f1.innerHTML += item;
+            else if(lots[id].floor === 'Floor 2') f2.innerHTML += item;
+            else fb.innerHTML += item;
+        }
+    });
+}
+
+function traceLot() {
+    let id = document.getElementById('trInput').value.trim().toUpperCase();
+    let hist = sheetData.filter(r => r[5] === id);
+    let out = document.getElementById('traceResult');
+    if(!hist.length) { out.innerHTML = "<p class='text-danger'>Not found!</p>"; return; }
+
+    let html = `<h6>History for <b>${id}</b></h6>`;
+    hist.forEach(r => {
+        let cls = r[8]==='Pass'?'text-success':'text-danger';
+        html += `<div class="timeline-item">
+            <small>${r[0].split('T')[0]}</small><br>
+            <b>${r[3]}</b> | <span class="${cls}">${r[8]}</span><br>
+            <small>${r[9]||'Clean'}</small>
+        </div>`;
+    });
+    out.innerHTML = html;
 }
 </script>
+
 </body>
 </html>
