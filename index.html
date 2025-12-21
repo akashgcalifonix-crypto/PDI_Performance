@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDI Master System v6.0 (Edit Update Fix)</title>
+    <title>PDI Master System v6.1 (Edit Fix Final)</title>
     
     <!-- Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -37,7 +37,6 @@
         .status-pass { background: #e6fffa; color: #234e52; padding: 5px 12px; border-radius: 6px; font-weight: bold; }
         .status-fail { background: #fff5f5; color: #822727; padding: 5px 12px; border-radius: 6px; font-weight: bold; }
 
-        /* KPI PREVIEW MODAL CARDS */
         .preview-card { border-radius: 12px; color: white; padding: 20px; text-align: center; }
         .c-total { background: #002244; }
         .c-pass { background: #28a745; }
@@ -49,7 +48,7 @@
 
 <div id="loader">
     <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;"></div>
-    <div class="mt-3 fw-bold fs-3 text-primary">Syncing with Sheet...</div>
+    <div class="mt-3 fw-bold fs-3 text-primary">Updating Sheet...</div>
 </div>
 
 <div class="app-header">
@@ -69,7 +68,7 @@
     <!-- DATA ENTRY TAB -->
     <div id="tab-form">
         <form id="pdiForm">
-            <!-- Hidden Input is crucial for Edit -->
+            <!-- HIDDEN INDEX FOR EDIT -->
             <input type="hidden" id="editRowIndex" value="">
             
             <div class="card p-4">
@@ -79,6 +78,7 @@
                         <input type="date" id="entryDate" class="form-control" required>
                     </div>
                     <div class="col-md-9 text-end">
+                        <!-- Add Row button hides during edit to prevent errors -->
                         <button type="button" class="btn btn-outline-primary btn-lg fw-bold" id="addRowBtn" onclick="addLotRow()">+ ADD ROW</button>
                     </div>
                 </div>
@@ -121,7 +121,7 @@
         </div>
     </div>
 
-    <!-- DASHBOARD TAB (No Changes) -->
+    <!-- DASHBOARD TAB (UNTOUCHED) -->
     <div id="tab-dashboard" style="display:none;">
         <div class="card p-4 mb-4 no-print">
             <div class="row g-4 align-items-end">
@@ -147,7 +147,7 @@
         </div>
     </div>
 
-    <!-- CLOSURE TAB (No Changes) -->
+    <!-- CLOSURE TAB (UNTOUCHED) -->
     <div id="tab-closure" style="display:none;">
         <div class="alert alert-info py-3 fs-5"><strong>Pending Lots</strong></div>
         <div class="row g-4 mb-5">
@@ -197,7 +197,7 @@ function switchTab(tab, btn) {
     if(tab === 'closure') runClosureReport();
 }
 
-// DATE HELPER (Force consistent format)
+// Fixed Date Function for matching
 function getLocalISO(dt) {
     let d = new Date(dt);
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -232,6 +232,7 @@ function renderRecentTable() {
     });
 }
 
+// FORM PREVIEW (Pass Lot + Reject Lot = Total Lot Formula)
 function showDaySummary() {
     const fDate = document.getElementById('recentFilter').value;
     let dayData = sheetData.filter(r => getLocalISO(r[0]) === fDate);
@@ -256,7 +257,6 @@ function showDaySummary() {
             <div class="col-md-3"><div class="preview-card c-reject"><div>REJECTED LOTS</div><h2 class="fw-bold">${fLots}</h2><small>Units: ${tQty-pQty}</small></div></div>
             <div class="col-md-3"><div class="preview-card c-rate"><div>PASS RATE %</div><h2 class="fw-bold">${passRate}%</h2></div></div>
         </div>
-        <h5>Floor Summary</h5>
         <table class="table table-bordered text-center align-middle mb-4">
             <thead class="table-light"><tr><th>Floor</th><th>Lots</th><th>Pass Lots</th><th>Total Qty</th><th>Pass Qty</th><th>Rate %</th></tr></thead>
             <tbody>
@@ -298,11 +298,11 @@ function addLotRow(data = null) {
     }
 }
 
-// ================= FIXED SUBMIT LOGIC =================
+// SUBMIT ACTION (FIXED TO PREVENT ADDING DURING EDIT)
 document.getElementById('pdiForm').onsubmit = async (e) => {
     e.preventDefault();
     
-    const editIdxStr = document.getElementById('editRowIndex').value;
+    const editIdx = document.getElementById('editRowIndex').value;
     const saveBtn = document.getElementById('saveBtn');
     
     document.getElementById('loader').style.display='flex';
@@ -323,39 +323,20 @@ document.getElementById('pdiForm').onsubmit = async (e) => {
         ]);
     });
 
-    // Action determine karein based on HIDDEN INPUT value
     let payload;
-    if (editIdxStr && editIdxStr !== "") {
-        // UPDATE MODE
-        payload = {
-            action: 'edit',
-            rowIndex: parseInt(editIdxStr),
-            data: rows[0]
-        };
+    if (editIdx && editIdx !== "") {
+        // ACTUAL UPDATE ACTION
+        payload = { action: 'edit', rowIndex: parseInt(editIdx), data: rows[0] };
     } else {
-        // NEW SAVE MODE
-        payload = {
-            action: 'save',
-            data: rows
-        };
+        // NEW SAVE ACTION
+        payload = { action: 'save', data: rows };
     }
 
     try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-        
-        if (response.ok) {
-            resetForm(); // Reset ensures hidden index is cleared
-            await loadAllData();
-        } else {
-            alert("Error: Server response was not ok.");
-        }
-    } catch (err) {
-        alert("Network Error: Could not connect to Sheet.");
-    }
-    
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        resetForm();
+        await loadAllData();
+    } catch (err) { alert("Network Error!"); }
     document.getElementById('loader').style.display='none';
 };
 
@@ -381,7 +362,7 @@ function editRec(idx) {
     saveBtn.innerText = "UPDATE RECORD";
     saveBtn.className = "btn btn-lg btn-warning px-5 fw-bold";
     
-    // Disable "Add Row" during edit to prevent multiple row updates
+    // HIDE ADD ROW BUTTON TO PREVENT ACCIDENTAL NEW ROWS DURING EDIT
     document.getElementById('addRowBtn').style.display = 'none';
     
     window.scrollTo(0,0);
@@ -389,20 +370,18 @@ function editRec(idx) {
 
 function resetForm() {
     document.getElementById('pdiForm').reset();
-    document.getElementById('editRowIndex').value = ""; // Clear hidden index
+    document.getElementById('editRowIndex').value = ""; 
     document.getElementById('lotContainer').innerHTML = "";
     addLotRow();
     
-    // Restore Button Appearance
+    // Restore buttons
     const saveBtn = document.getElementById('saveBtn');
     saveBtn.innerText = "SAVE TO SHEET";
     saveBtn.className = "btn btn-lg btn-success px-5 fw-bold";
-    
-    // Restore "Add Row" button
     document.getElementById('addRowBtn').style.display = 'inline-block';
 }
 
-// DASHBOARD & CLOSURE LOGIC (Rest of code remains same)
+// DASHBOARD & CLOSURE LOGIC (UNCHANGED)
 function runDashboardAnalysis() {
     const from = document.getElementById('dashFrom').value, to = document.getElementById('dashTo').value;
     let dLots=0, dQty=0, pLots=0, pQty=0, dates={}, lines={}, floors={"Floor 1":{p:0,t:0},"Floor 2":{p:0,t:0},"Basement":{p:0,t:0}}, defects={};
