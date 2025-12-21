@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDI Master System v8.0 Pro</title>
+    <title>PDI Master System v8.1 (Big Font & Date Fix)</title>
     
     <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -15,63 +15,63 @@
 
     <style>
         :root { --primary: #0f172a; --secondary: #334155; --accent: #2563eb; --success: #10b981; --danger: #ef4444; }
-        body { background-color: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 16px; }
+        
+        /* INCREASED FONT SIZES */
+        body { background-color: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 18px; } /* Base Font 18px */
         
         /* Navigation */
-        .app-header { background: var(--primary); padding: 15px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
-        .nav-pills .nav-link { color: #94a3b8; font-weight: 600; padding: 10px 20px; border-radius: 8px; transition: 0.3s; }
-        .nav-pills .nav-link.active { background-color: var(--accent); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
-        .nav-pills .nav-link:hover:not(.active) { background: rgba(255,255,255,0.1); color: white; }
+        .app-header { background: var(--primary); padding: 18px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .logo { height: 45px; }
+        .nav-pills .nav-link { font-size: 18px; font-weight: 600; padding: 12px 25px; border-radius: 8px; color: #cbd5e1; }
+        .nav-pills .nav-link.active { background-color: var(--accent); color: white; }
+
+        /* Form & Inputs */
+        .form-control, .form-select { font-size: 18px; padding: 10px 15px; height: auto; }
+        .form-label { font-weight: 600; font-size: 16px; color: var(--secondary); }
+        .btn { font-size: 18px; padding: 10px 24px; font-weight: 600; }
         
-        /* Cards & UI */
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); background: white; margin-bottom: 20px; }
-        .btn { border-radius: 8px; padding: 10px 20px; font-weight: 600; transition: transform 0.2s; }
-        .btn:active { transform: scale(0.98); }
-        
-        /* Loader */
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        /* Tables - Bigger Text */
+        .table th { font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; padding: 15px; background: #f8fafc; }
+        .table td { font-size: 18px; padding: 15px; vertical-align: middle; }
         
         /* Status Badges */
-        .status-badge { padding: 6px 12px; border-radius: 50px; font-size: 0.85em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-badge { padding: 8px 16px; border-radius: 50px; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .st-pass { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
         .st-fail { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
-        /* --- NEW PREVIEW MODAL STYLES --- */
-        .modal-content { border: none; border-radius: 16px; overflow: hidden; }
-        .modal-header { background: var(--primary); color: white; padding: 20px 30px; border-bottom: none; }
-        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-bottom: 4px solid transparent; height: 100%; transition: transform 0.2s; }
-        .stat-card:hover { transform: translateY(-3px); }
-        .stat-icon { font-size: 2rem; margin-bottom: 10px; opacity: 0.8; }
-        .stat-title { color: #64748b; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-value { font-size: 2rem; font-weight: 800; color: var(--primary); margin: 5px 0; }
-        .stat-sub { font-size: 0.85rem; color: #94a3b8; }
-        
-        /* Stat Card Colors */
-        .b-blue { border-color: var(--accent); } .b-blue .stat-icon { color: var(--accent); }
-        .b-green { border-color: var(--success); } .b-green .stat-icon { color: var(--success); }
-        .b-red { border-color: var(--danger); } .b-red .stat-icon { color: var(--danger); }
-        .b-dark { border-color: var(--secondary); } .b-dark .stat-icon { color: var(--secondary); }
+        /* Preview Modal Cards */
+        .modal-content { border-radius: 16px; }
+        .stat-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-bottom: 5px solid transparent; }
+        .stat-value { font-size: 2.5rem; font-weight: 800; color: var(--primary); margin: 5px 0; }
+        .stat-title { font-size: 1rem; font-weight: 600; color: #64748b; text-transform: uppercase; }
+
+        /* Color Borders */
+        .b-blue { border-color: var(--accent); } .b-green { border-color: var(--success); }
+        .b-red { border-color: var(--danger); } .b-dark { border-color: var(--secondary); }
 
         /* Preview Table */
-        .pro-table thead { background: #f8fafc; color: #475569; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; }
-        .pro-table th, .pro-table td { padding: 12px 15px; vertical-align: middle; }
-        .pro-table .total-row { background: var(--primary) !important; color: white; font-weight: bold; font-size: 1.1em; }
+        .pro-table th { background: #e2e8f0; font-weight: 700; font-size: 17px; }
+        .pro-table td { font-size: 19px; }
+        .pro-table .total-row { background: var(--primary) !important; color: white; font-weight: bold; font-size: 20px; }
         
+        .card { border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); border: none; margin-bottom: 25px; }
         .edit-active { background-color: #fffbeb !important; border: 2px dashed #f59e0b !important; }
+        
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
 
 <div id="loader">
-    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
-    <div class="mt-3 fw-bold text-dark">Syncing Data...</div>
+    <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;"></div>
+    <div class="mt-3 fw-bold fs-4 text-dark">Syncing Data...</div>
 </div>
 
 <!-- Header -->
 <div class="app-header no-print d-flex align-items-center justify-content-between">
     <div class="d-flex align-items-center gap-3">
-        <div class="bg-white rounded-circle p-1"><img src="https://i.postimg.cc/5y7SN4xc/logo.png" style="height: 40px;"></div>
-        <h5 class="m-0 fw-bold text-white tracking-wide">PDI MASTER <span style="color: var(--accent);">PRO</span></h5>
+        <img src="https://i.postimg.cc/5y7SN4xc/logo.png" class="logo bg-white rounded p-1">
+        <h4 class="m-0 fw-bold text-white tracking-wide">PDI MASTER <span style="color: var(--accent);">PRO</span></h4>
     </div>
     <div class="nav nav-pills">
         <button class="nav-link active" onclick="switchTab('form', this)"><i class="bi bi-pencil-square me-2"></i>Entry</button>
@@ -91,11 +91,11 @@
             <div class="card p-4" id="formCard">
                 <div class="row g-4 align-items-end">
                     <div class="col-md-3">
-                        <label class="fw-bold text-muted small mb-1">SELECT DATE</label>
-                        <input type="date" id="entryDate" class="form-control form-control-lg fw-bold" required>
+                        <label class="form-label">SELECT DATE</label>
+                        <input type="date" id="entryDate" class="form-control fw-bold" required>
                     </div>
                     <div class="col-md-9 text-end">
-                        <button type="button" class="btn btn-outline-primary btn-lg" id="addRowBtn" onclick="addLotRow()">
+                        <button type="button" class="btn btn-outline-primary" id="addRowBtn" onclick="addLotRow()">
                             <i class="bi bi-plus-lg me-2"></i>Add Line Item
                         </button>
                     </div>
@@ -105,10 +105,10 @@
             <!-- Input Table -->
             <div class="card mt-3 overflow-hidden">
                 <div class="table-responsive">
-                    <table class="table table-bordered align-middle mb-0 text-center table-hover" style="min-width: 1300px;">
-                        <thead class="table-light text-secondary small">
+                    <table class="table table-bordered align-middle mb-0 text-center table-hover" style="min-width: 1400px;">
+                        <thead class="text-secondary">
                             <tr>
-                                <th width="8%">LINE</th><th width="15%">MODEL</th><th width="12%">COLOUR</th>
+                                <th width="9%">LINE</th><th width="15%">MODEL</th><th width="12%">COLOUR</th>
                                 <th width="12%">LOT ID</th><th width="8%">QTY</th><th width="10%">STATUS</th>
                                 <th width="10%">RESULT</th><th>DEFECT / REMARKS</th><th width="5%"></th>
                             </tr>
@@ -120,8 +120,8 @@
 
             <!-- Action Buttons -->
             <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
-                <button type="button" class="btn btn-lg btn-light border px-4" onclick="resetForm()">Cancel</button>
-                <button type="submit" id="saveBtn" class="btn btn-lg btn-primary px-5 shadow-sm">
+                <button type="button" class="btn btn-light border px-4" onclick="resetForm()">Cancel</button>
+                <button type="submit" id="saveBtn" class="btn btn-primary px-5 shadow-sm">
                     <i class="bi bi-cloud-upload me-2"></i>SAVE RECORDS
                 </button>
             </div>
@@ -130,10 +130,10 @@
         <!-- Recent Records & Filter -->
         <div class="card">
             <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
-                <span class="fw-bold text-secondary"><i class="bi bi-clock-history me-2"></i>Recent Entries</span>
+                <span class="fw-bold fs-5 text-secondary"><i class="bi bi-clock-history me-2"></i>Recent Entries</span>
                 <div class="d-flex gap-2">
-                    <input type="date" id="recentFilter" class="form-control form-control-sm w-auto" onchange="renderRecentTable()">
-                    <button class="btn btn-sm btn-dark px-3" onclick="showDaySummary()"><i class="bi bi-eye me-2"></i>Preview Report</button>
+                    <input type="date" id="recentFilter" class="form-control w-auto" onchange="renderRecentTable()">
+                    <button class="btn btn-dark px-3" onclick="showDaySummary()"><i class="bi bi-eye me-2"></i>Preview Report</button>
                 </div>
             </div>
             <div class="table-responsive">
@@ -150,57 +150,57 @@
     <!-- DASHBOARD TAB -->
     <div id="tab-dashboard" style="display:none;">
         <div class="card p-4 mb-4 no-print">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-3"><label class="fw-bold small">From Date</label><input type="date" id="dashFrom" class="form-control"></div>
-                <div class="col-md-3"><label class="fw-bold small">To Date</label><input type="date" id="dashTo" class="form-control"></div>
+            <div class="row g-4 align-items-end">
+                <div class="col-md-3"><label class="form-label">From Date</label><input type="date" id="dashFrom" class="form-control"></div>
+                <div class="col-md-3"><label class="form-label">To Date</label><input type="date" id="dashTo" class="form-control"></div>
                 <div class="col-md-2"><button class="btn btn-primary w-100" onclick="runDashboardAnalysis()">Apply Filter</button></div>
                 <div class="col-md-4 text-end"><button class="btn btn-danger" onclick="downloadPDF()"><i class="bi bi-file-earmark-pdf me-2"></i>Export PDF</button></div>
             </div>
         </div>
         <div id="pdf-content">
-            <div class="row g-4 mb-4 text-center">
-                <div class="col-md-3"><div class="stat-card b-dark"><i class="bi bi-box-seam stat-icon"></i><div class="stat-val" id="d_lots">0</div><div class="stat-title">Total Lots</div></div></div>
-                <div class="col-md-3"><div class="stat-card b-blue"><i class="bi bi-layers stat-icon"></i><div class="stat-val" id="d_qty">0</div><div class="stat-title">Total Qty</div></div></div>
-                <div class="col-md-3"><div class="stat-card b-green"><i class="bi bi-check-circle stat-icon"></i><div class="stat-val" id="d_lar">0%</div><div class="stat-title">LAR %</div></div></div>
-                <div class="col-md-3"><div class="stat-card b-green"><i class="bi bi-pie-chart stat-icon"></i><div class="stat-val" id="d_pass">0%</div><div class="stat-title">Pass Rate</div></div></div>
+            <div class="row g-4 mb-5 text-center">
+                <div class="col-md-3"><div class="stat-card b-dark"><i class="bi bi-box-seam fs-1 mb-2"></i><div class="stat-value" id="d_lots">0</div><div class="stat-title">Total Lots</div></div></div>
+                <div class="col-md-3"><div class="stat-card b-blue"><i class="bi bi-layers fs-1 mb-2 text-primary"></i><div class="stat-value" id="d_qty">0</div><div class="stat-title">Total Qty</div></div></div>
+                <div class="col-md-3"><div class="stat-card b-green"><i class="bi bi-check-circle fs-1 mb-2 text-success"></i><div class="stat-value" id="d_lar">0%</div><div class="stat-title">LAR %</div></div></div>
+                <div class="col-md-3"><div class="stat-card b-green"><i class="bi bi-pie-chart fs-1 mb-2 text-success"></i><div class="stat-value" id="d_pass">0%</div><div class="stat-title">Pass Rate</div></div></div>
             </div>
             <div class="row g-4">
-                <div class="col-md-12"><div class="card p-3"><div id="ch_trend" style="height:350px"></div></div></div>
-                <div class="col-md-6"><div class="card p-3"><div id="ch_line" style="height:300px"></div></div></div>
-                <div class="col-md-6"><div class="card p-3"><div id="ch_floor" style="height:300px"></div></div></div>
+                <div class="col-md-12"><div class="card p-4"><div id="ch_trend" style="height:400px"></div></div></div>
+                <div class="col-md-6"><div class="card p-4"><div id="ch_line" style="height:350px"></div></div></div>
+                <div class="col-md-6"><div class="card p-4"><div id="ch_floor" style="height:350px"></div></div></div>
             </div>
         </div>
     </div>
 
     <!-- CLOSURE TAB -->
     <div id="tab-closure" style="display:none;">
-        <div class="alert alert-warning border-warning d-flex align-items-center">
-            <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
-            <div><strong>Action Items:</strong> These lots require immediate attention or rework.</div>
+        <div class="alert alert-warning border-warning d-flex align-items-center p-4">
+            <i class="bi bi-exclamation-triangle-fill me-3 fs-3"></i>
+            <div class="fs-5"><strong>Action Items:</strong> These lots require immediate attention or rework.</div>
         </div>
         <div class="row g-4">
-            <div class="col-md-4"><div class="card h-100"><div class="card-header bg-light fw-bold text-center">Floor 1 Pending</div><div class="card-body" id="list_f1"></div></div></div>
-            <div class="col-md-4"><div class="card h-100"><div class="card-header bg-light fw-bold text-center">Floor 2 Pending</div><div class="card-body" id="list_f2"></div></div></div>
-            <div class="col-md-4"><div class="card h-100"><div class="card-header bg-light fw-bold text-center">Basement Pending</div><div class="card-body" id="list_fb"></div></div></div>
+            <div class="col-md-4"><div class="card h-100"><div class="card-header bg-light fw-bold text-center fs-5 py-3">Floor 1 Pending</div><div class="card-body fs-5" id="list_f1"></div></div></div>
+            <div class="col-md-4"><div class="card h-100"><div class="card-header bg-light fw-bold text-center fs-5 py-3">Floor 2 Pending</div><div class="card-body fs-5" id="list_f2"></div></div></div>
+            <div class="col-md-4"><div class="card h-100"><div class="card-header bg-light fw-bold text-center fs-5 py-3">Basement Pending</div><div class="card-body fs-5" id="list_fb"></div></div></div>
         </div>
     </div>
 </div>
 
-<!-- PROFESSIONAL PREVIEW MODAL -->
+<!-- PREVIEW MODAL -->
 <div class="modal fade" id="summaryModal" tabindex="-1">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header d-flex justify-content-between align-items-center">
+            <div class="modal-header d-flex justify-content-between align-items-center py-3 bg-primary text-white">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="bg-white rounded p-1"><img src="https://i.postimg.cc/5y7SN4xc/logo.png" style="height: 35px;"></div>
+                    <img src="https://i.postimg.cc/5y7SN4xc/logo.png" style="height: 40px;" class="bg-white rounded p-1">
                     <div>
-                        <h5 class="m-0 fw-bold">Daily Production Summary</h5>
-                        <small class="text-white-50" id="previewDateDisplay">Date: --/--/----</small>
+                        <h4 class="m-0 fw-bold">Daily Production Summary</h4>
+                        <small id="previewDateDisplay" class="fs-6" style="opacity:0.9;">Date: --/--/----</small>
                     </div>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body bg-light" id="summaryBody"></div>
+            <div class="modal-body bg-light p-4" id="summaryBody"></div>
             <div class="modal-footer bg-white">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button class="btn btn-primary" onclick="window.print()">Print Report</button>
@@ -239,13 +239,21 @@ function switchTab(tab, btn) {
 
 function getLocalISO(dt) { return new Date(dt).toISOString().split('T')[0]; }
 
+// FIX: Helper for Indian Date Format (DD/MM/YYYY)
+function formatIndianDate(isoDateStr) {
+    const d = new Date(isoDateStr);
+    return d.getDate().toString().padStart(2, '0') + '/' + 
+           (d.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+           d.getFullYear();
+}
+
 async function loadAllData() {
     document.getElementById('loader').style.display='flex';
     try {
         const res = await fetch(API_URL);
         const json = await res.json();
         sheetData = json.data;
-        if(sheetData[0] && sheetData[0][0] === "Date") sheetData.shift(); // Remove header
+        if(sheetData[0] && sheetData[0][0] === "Date") sheetData.shift(); 
         renderRecentTable();
     } catch(e) { console.error(e); }
     document.getElementById('loader').style.display='none';
@@ -258,8 +266,11 @@ function renderRecentTable() {
     sheetData.filter(r => getLocalISO(r[0]) === fDate).reverse().forEach(r => {
         let idx = sheetData.indexOf(r);
         let statusClass = r[8] === 'Pass' ? 'st-pass' : 'st-fail';
+        // Date Fix Applied Here:
+        let displayDate = formatIndianDate(r[0]); 
+        
         tb.innerHTML += `<tr>
-            <td>${new Date(r[0]).toLocaleDateString()}</td><td>L${r[1]}</td><td>${r[3]}</td><td class="fw-bold text-dark">${r[5]}</td><td>${r[6]}</td>
+            <td>${displayDate}</td><td>L${r[1]}</td><td>${r[3]}</td><td class="fw-bold text-dark">${r[5]}</td><td>${r[6]}</td>
             <td><span class="status-badge ${statusClass}">${r[8]}</span></td>
             <td>
                 <button class="btn btn-light border btn-sm text-warning" onclick="editRec(${idx})"><i class="bi bi-pencil-fill"></i></button>
@@ -269,16 +280,15 @@ function renderRecentTable() {
     });
 }
 
-// --- UPDATED PREVIEW FUNCTION WITH TOTAL ROW ---
 function showDaySummary() {
     const fDate = document.getElementById('recentFilter').value;
-    document.getElementById('previewDateDisplay').innerText = "Report Date: " + new Date(fDate).toDateString();
+    // Date Fix Applied Here for Preview Header
+    document.getElementById('previewDateDisplay').innerText = "Report Date: " + formatIndianDate(fDate);
     
     let dayData = sheetData.filter(r => getLocalISO(r[0]) === fDate);
     if(!dayData.length) return alert("No data found for selected date!");
 
     let pLots=0, fLots=0, tQty=0, pQty=0;
-    // Initialise floors with order
     let floors = {
         "Floor 1": {tQ:0, pQ:0, tL:0, pL:0}, 
         "Floor 2": {tQ:0, pQ:0, tL:0, pL:0}, 
@@ -288,7 +298,7 @@ function showDaySummary() {
 
     dayData.forEach(r => {
         let q = parseInt(r[6]||0), fl = r[2] || "Floor 1";
-        if(!floors[fl]) floors[fl] = {tQ:0, pQ:0, tL:0, pL:0}; // Safety
+        if(!floors[fl]) floors[fl] = {tQ:0, pQ:0, tL:0, pL:0}; 
 
         tQty += q; floors[fl].tQ += q; floors[fl].tL++;
         if(r[8]==='Pass') { 
@@ -301,122 +311,47 @@ function showDaySummary() {
 
     let passRate = tQty > 0 ? ((pQty / tQty) * 100).toFixed(2) : "0.00";
     
-    // --- CALCULATE GRAND TOTALS FOR TABLE ---
+    // Total Logic
     let total_Lots = 0, total_PassL = 0, total_Qty = 0, total_PassQ = 0;
     Object.keys(floors).forEach(f => {
-        total_Lots += floors[f].tL;
-        total_PassL += floors[f].pL;
-        total_Qty += floors[f].tQ;
-        total_PassQ += floors[f].pQ;
+        total_Lots += floors[f].tL; total_PassL += floors[f].pL;
+        total_Qty += floors[f].tQ; total_PassQ += floors[f].pQ;
     });
     let total_Rate = total_Qty > 0 ? ((total_PassQ / total_Qty) * 100).toFixed(2) : "0.00";
 
-    // --- GENERATE HTML ---
     let html = `
-        <!-- KPI Cards -->
         <div class="row g-4 mb-5 mt-2">
-            <div class="col-md-3">
-                <div class="stat-card b-dark">
-                    <i class="bi bi-clipboard-data stat-icon"></i>
-                    <div class="stat-title">Total Production</div>
-                    <div class="stat-value">${pLots+fLots} <span class="fs-6 text-muted">Lots</span></div>
-                    <div class="stat-sub">Units: ${tQty}</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card b-green">
-                    <i class="bi bi-check-circle-fill stat-icon"></i>
-                    <div class="stat-title">Passed Lots</div>
-                    <div class="stat-value text-success">${pLots}</div>
-                    <div class="stat-sub">Units: ${pQty}</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card b-red">
-                    <i class="bi bi-x-octagon-fill stat-icon"></i>
-                    <div class="stat-title">Rejected Lots</div>
-                    <div class="stat-value text-danger">${fLots}</div>
-                    <div class="stat-sub">Units: ${tQty-pQty}</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card b-blue">
-                    <i class="bi bi-pie-chart-fill stat-icon"></i>
-                    <div class="stat-title">Overall Pass Rate</div>
-                    <div class="stat-value text-primary">${passRate}%</div>
-                    <div class="progress mt-2" style="height: 6px;">
-                        <div class="progress-bar" style="width: ${passRate}%"></div>
-                    </div>
-                </div>
-            </div>
+            <div class="col-md-3"><div class="stat-card b-dark"><i class="bi bi-clipboard-data fs-1 text-secondary mb-2"></i><div class="stat-title">Total Production</div><div class="stat-value">${pLots+fLots} <small class="fs-6 text-muted">Lots</small></div><div class="fs-5 text-muted">Units: ${tQty}</div></div></div>
+            <div class="col-md-3"><div class="stat-card b-green"><i class="bi bi-check-circle-fill fs-1 text-success mb-2"></i><div class="stat-title">Passed Lots</div><div class="stat-value text-success">${pLots}</div><div class="fs-5 text-muted">Units: ${pQty}</div></div></div>
+            <div class="col-md-3"><div class="stat-card b-red"><i class="bi bi-x-octagon-fill fs-1 text-danger mb-2"></i><div class="stat-title">Rejected Lots</div><div class="stat-value text-danger">${fLots}</div><div class="fs-5 text-muted">Units: ${tQty-pQty}</div></div></div>
+            <div class="col-md-3"><div class="stat-card b-blue"><i class="bi bi-pie-chart-fill fs-1 text-primary mb-2"></i><div class="stat-title">Overall Pass Rate</div><div class="stat-value text-primary">${passRate}%</div><div class="progress mt-2" style="height: 8px;"><div class="progress-bar" style="width: ${passRate}%"></div></div></div></div>
         </div>
 
-        <!-- Floor Table -->
-        <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-table me-2"></i>FLOOR WISE PERFORMANCE</h6>
+        <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-table me-2"></i>FLOOR WISE PERFORMANCE</h5>
         <div class="card shadow-sm border-0 mb-5">
             <table class="table pro-table mb-0 text-center table-bordered">
-                <thead>
-                    <tr>
-                        <th class="bg-light">Floor Name</th>
-                        <th>Total Lots</th>
-                        <th>Passed Lots</th>
-                        <th>Total Qty</th>
-                        <th>Passed Qty</th>
-                        <th>Pass Rate %</th>
-                    </tr>
-                </thead>
+                <thead><tr><th class="bg-light">Floor Name</th><th>Total Lots</th><th>Passed Lots</th><th>Total Qty</th><th>Passed Qty</th><th>Pass Rate %</th></tr></thead>
                 <tbody>
                     ${Object.keys(floors).map(f => {
                         let rate = floors[f].tQ ? ((floors[f].pQ/floors[f].tQ)*100).toFixed(2) : "0.00";
-                        return `<tr>
-                            <td class="fw-bold text-start ps-4">${f}</td>
-                            <td>${floors[f].tL}</td>
-                            <td>${floors[f].pL}</td>
-                            <td>${floors[f].tQ}</td>
-                            <td>${floors[f].pQ}</td>
-                            <td><span class="badge ${rate>=90?'bg-success':(rate>=80?'bg-warning text-dark':'bg-danger')}">${rate}%</span></td>
-                        </tr>`;
+                        return `<tr><td class="fw-bold text-start ps-4">${f}</td><td>${floors[f].tL}</td><td>${floors[f].pL}</td><td>${floors[f].tQ}</td><td>${floors[f].pQ}</td><td><span class="badge ${rate>=90?'bg-success':(rate>=80?'bg-warning text-dark':'bg-danger')} p-2 fs-6">${rate}%</span></td></tr>`;
                     }).join('')}
                 </tbody>
-                <!-- ADDED TOTAL ROW HERE -->
                 <tfoot class="total-row">
-                    <tr>
-                        <td class="text-start ps-4">GRAND TOTAL</td>
-                        <td>${total_Lots}</td>
-                        <td>${total_PassL}</td>
-                        <td>${total_Qty}</td>
-                        <td>${total_PassQ}</td>
-                        <td>${total_Rate}%</td>
-                    </tr>
+                    <tr><td class="text-start ps-4">GRAND TOTAL</td><td>${total_Lots}</td><td>${total_PassL}</td><td>${total_Qty}</td><td>${total_PassQ}</td><td>${total_Rate}%</td></tr>
                 </tfoot>
             </table>
         </div>
 
-        <!-- Rejections Section -->
-        <h6 class="fw-bold text-danger mb-3"><i class="bi bi-bug-fill me-2"></i>REJECTED / FAILED LOTS</h6>
+        <h5 class="fw-bold text-danger mb-3"><i class="bi bi-bug-fill me-2"></i>REJECTED / FAILED LOTS</h5>
         ${rejects.length > 0 ? `
             <div class="card shadow-sm border-0 border-start border-4 border-danger">
                 <table class="table table-striped mb-0 align-middle">
-                    <thead class="table-danger">
-                        <tr><th>Line</th><th>Model</th><th>Lot ID</th><th>Qty</th><th>Defect Remarks</th></tr>
-                    </thead>
-                    <tbody>
-                        ${rejects.map(r => `<tr>
-                            <td><b>L${r[1]}</b></td>
-                            <td>${r[3]}</td>
-                            <td class="text-danger fw-bold">${r[5]}</td>
-                            <td>${r[6]}</td>
-                            <td class="text-danger text-wrap text-start">${r[9]||"-"}</td>
-                        </tr>`).join('')}
-                    </tbody>
+                    <thead class="table-danger"><tr><th>Line</th><th>Model</th><th>Lot ID</th><th>Qty</th><th>Defect Remarks</th></tr></thead>
+                    <tbody>${rejects.map(r => `<tr><td><b>L${r[1]}</b></td><td>${r[3]}</td><td class="text-danger fw-bold">${r[5]}</td><td>${r[6]}</td><td class="text-danger text-wrap text-start">${r[9]||"-"}</td></tr>`).join('')}</tbody>
                 </table>
             </div>
-        ` : `
-            <div class="alert alert-success d-flex align-items-center">
-                <i class="bi bi-hand-thumbs-up-fill fs-4 me-3"></i>
-                <div><strong>Excellent!</strong> No rejected lots found for this date.</div>
-            </div>
-        `}
+        ` : `<div class="alert alert-success d-flex align-items-center p-3"><i class="bi bi-hand-thumbs-up-fill fs-3 me-3"></i><div><strong>Excellent!</strong> No rejected lots found for this date.</div></div>`}
     `;
     
     document.getElementById('summaryBody').innerHTML = html;
@@ -436,7 +371,7 @@ function addLotRow(data = null) {
         <td><select class="form-select i-status"><option>Fresh</option><option>Rework</option></select></td>
         <td><select class="form-select i-res fw-bold" onchange="toggleRem(this)"><option value="Pass">Pass</option><option value="Fail">Fail</option></select></td>
         <td><input type="text" class="form-control i-rem" placeholder="Remarks" disabled></td>
-        <td><button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="this.closest('tr').remove()"><i class="bi bi-x-lg"></i></button></td>
+        <td><button type="button" class="btn btn-outline-danger btn-sm border-0 px-3" onclick="this.closest('tr').remove()"><i class="bi bi-x-lg"></i></button></td>
     `;
     document.getElementById('lotContainer').appendChild(tr);
     
@@ -501,13 +436,13 @@ document.getElementById('pdiForm').onsubmit = async (e) => {
     try {
         await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
         resetForm(); await loadAllData();
-        alert("Data Saved Successfully!");
+        alert("Success!");
     } catch (err) { alert("Error saving data"); }
     document.getElementById('loader').style.display='none';
 };
 
 async function deleteRec(idx) {
-    if(!confirm("Are you sure you want to delete this record?")) return;
+    if(!confirm("Are you sure?")) return;
     document.getElementById('loader').style.display='flex';
     await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'delete', rowIndex: idx + 2})});
     await loadAllData();
@@ -521,7 +456,7 @@ function editRec(idx) {
     
     const sBtn = document.getElementById('saveBtn');
     sBtn.innerHTML = '<i class="bi bi-check2-all me-2"></i>UPDATE RECORD';
-    sBtn.className = "btn btn-lg btn-warning px-5 shadow-sm text-dark fw-bold";
+    sBtn.className = "btn btn-warning px-5 shadow-sm text-dark fw-bold";
     document.getElementById('formCard').className="card p-4 edit-active";
     document.getElementById('addRowBtn').style.display = 'none';
     window.scrollTo(0,0);
@@ -534,17 +469,15 @@ function resetForm() {
     
     const sBtn = document.getElementById('saveBtn');
     sBtn.innerHTML = '<i class="bi bi-cloud-upload me-2"></i>SAVE RECORDS';
-    sBtn.className = "btn btn-lg btn-primary px-5 shadow-sm";
+    sBtn.className = "btn btn-primary px-5 shadow-sm";
     
     document.getElementById('formCard').className = "card p-4";
     document.getElementById('addRowBtn').style.display = 'inline-block';
 }
 
 function runDashboardAnalysis() {
-    // Basic chart implementation kept same, styled via CSS
     const from = document.getElementById('dashFrom').value, to = document.getElementById('dashTo').value;
-    let dLots=0, dQty=0, pLots=0, pQty=0;
-    let dates={}; 
+    let dLots=0, dQty=0, pLots=0, pQty=0, dates={}; 
 
     sheetData.forEach(r => {
         let rd = getLocalISO(r[0]);
@@ -562,12 +495,11 @@ function runDashboardAnalysis() {
     document.getElementById('d_lar').innerText = dLots ? (pLots/dLots*100).toFixed(1)+"%" : "0%";
     document.getElementById('d_pass').innerText = dQty ? (pQty/dQty*100).toFixed(1)+"%" : "0%";
 
-    // Draw simple chart
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Date');
     data.addColumn('number', 'Pass Rate');
     Object.keys(dates).sort().forEach(d => {
-        data.addRow([d.substr(5), (dates[d].t ? (dates[d].p/dates[d].t)*100 : 0)]);
+        data.addRow([formatIndianDate(d).substr(0,5), (dates[d].t ? (dates[d].p/dates[d].t)*100 : 0)]);
     });
 
     new google.visualization.AreaChart(document.getElementById('ch_trend')).draw(data, {
