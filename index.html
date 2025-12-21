@@ -280,7 +280,7 @@ function showDaySummary() {
                 </thead>
                 <tbody>
                     ${Object.keys(floors).map(f => {
-                        let fRate = floors[f].tQty > 0 ? ((floors[f].rQty / floors[f].tQty) * 100).toFixed(2) : 0;
+                        let fRate = floors[f].tQty > 0 ? ((floors[f].pQty / floors[f].tQty) * 100).toFixed(2) : 0;
                         return `<tr>
                             <td class="fw-bold">${f}</td>
                             <td>${floors[f].tLots}</td>
