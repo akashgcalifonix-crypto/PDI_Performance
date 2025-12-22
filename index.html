@@ -17,7 +17,7 @@
     <style>
         /* --- THEME --- */
         :root { --primary: #0f172a; --secondary: #334155; --accent: #3b82f6; --success: #10b981; --danger: #ef4444; }
-        body { background-color: #f1f5f9; font-family: 'Segoe UI', sans-serif; font-size: 18x; color: var(--primary); }
+        body { background-color: #f1f5f9; font-family: 'Segoe UI', sans-serif; font-size: 18px; color: var(--primary); }
         
         /* --- UI ELEMENTS --- */
         .form-control, .form-select, .btn { font-size: 18px; padding: 12px; border-radius: 8px; }
@@ -120,20 +120,18 @@
         </div>
     </div>
 
-    <!-- DASHBOARD TAB (UPDATED WITH PREVIEW) -->
+    <!-- DASHBOARD TAB -->
     <div id="tab-dashboard" style="display:none;">
         <div class="card p-4 mb-4 no-print">
             <div class="row g-4 align-items-end">
                 <div class="col-md-3"><label class="fw-bold text-muted">From Date</label><input type="date" id="dashFrom" class="form-control"></div>
                 <div class="col-md-3"><label class="fw-bold text-muted">To Date</label><input type="date" id="dashTo" class="form-control"></div>
                 <div class="col-md-2"><button class="btn btn-primary w-100 fw-bold" onclick="runDashboardAnalysis()">FILTER DATA</button></div>
-                <!-- Added Preview Button -->
                 <div class="col-md-2"><button class="btn btn-info text-white w-100 fw-bold" onclick="showDashboardPreview()"><i class="bi bi-table me-2"></i>PREVIEW DETAILS</button></div>
                 <div class="col-md-2 text-end"><button class="btn btn-danger shadow-sm w-100" onclick="downloadPDF()"><i class="bi bi-file-pdf-fill me-2"></i>Download PDF</button></div>
             </div>
         </div>
         <div id="pdf-content">
-            <!-- UPDATED KPI CARDS: Qty | Pass Qty | Reject Qty | Pass Rate -->
             <div class="row g-4 mb-5">
                 <div class="col-md-3"><div class="stat-card b-dark"><i class="bi bi-layers stat-icon"></i><div class="stat-val" id="d_total_qty">0</div><div class="stat-label">Total Qty</div></div></div>
                 <div class="col-md-3"><div class="stat-card b-green"><i class="bi bi-check-circle-fill stat-icon"></i><div class="stat-val" id="d_passed_qty">0</div><div class="stat-label">Total Passed Qty</div></div></div>
@@ -149,7 +147,7 @@
         </div>
     </div>
 
-    <!-- CLOSURE TAB (UPDATED WITH REWORK DATA) -->
+    <!-- CLOSURE TAB -->
     <div id="tab-closure" style="display:none;">
         <div class="alert alert-light border shadow-sm p-4 mb-4 d-flex align-items-center">
             <i class="bi bi-info-circle-fill text-primary fs-3 me-3"></i>
@@ -160,8 +158,6 @@
             <div class="col-md-4"><div class="closure-col"><div class="closure-header text-success">Floor 2</div><div id="list_f2"></div></div></div>
             <div class="col-md-4"><div class="closure-col"><div class="closure-header text-dark">Basement</div><div id="list_fb"></div></div></div>
         </div>
-
-        <!-- NEW SECTION: REWORKED / PASSED TICKETS RAW DATA -->
         <div class="card mt-5">
             <div class="card-header bg-success text-white d-flex align-items-center">
                 <i class="bi bi-check-all fs-4 me-2"></i>
@@ -171,18 +167,9 @@
                 <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                     <table class="table table-striped table-hover mb-0 text-center align-middle">
                         <thead class="table-light sticky-top">
-                            <tr>
-                                <th>Date (Fail)</th>
-                                <th>Line</th>
-                                <th>Model</th>
-                                <th>Lot ID</th>
-                                <th>Defect</th>
-                                <th>Current Status</th>
-                            </tr>
+                            <tr><th>Date (Fail)</th><th>Line</th><th>Model</th><th>Lot ID</th><th>Defect</th><th>Current Status</th></tr>
                         </thead>
-                        <tbody id="reworkTableBody">
-                            <!-- Populated via JS -->
-                        </tbody>
+                        <tbody id="reworkTableBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -204,10 +191,109 @@
     </div>
 </div>
 
+<!-- DATA LIST CONTAINER FOR TYPING MODEL -->
+<datalist id="modelList"></datalist>
+
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyvBKmQ9GDPwPJXiSBh7En0YPTrJ3uemT7T6nlx-j9EGLJI6fPHXGRhExla4ImSfFyf/exec";
-const MODELS = ["Unity ANC","Ace","111v2","131 Elite Anc","131 Gen 2","141 Anc","161 Anc","161 N","181 Pro","191 Anc","192","212","280 Anc","300","71","800","91","Ace Gen 2","Hype","Kick","Nirvana Crystal","Nirvana Iris","Nirvana X","Plus 311","Prime 412","Primo","Pulse","Supreme","Ultra Pro","100","121 Pro","131","141","161","161 Pro-Buds","181","190","191 G","207","Alpha","Amazon basics","Atom 81 Pro","Atom 83","Atom81","HMD P50","HMD S60","HMD X50","IMT 100","IMT121","IMT131","IMT161","Joy","Max","Nirvana","Nirvana Ion","R 195 Pro","Ultra Plus","Zing"];
-const COLOURS = ["Black","Blue","Bold Blue","Crimson Cream","Graphite Grey","Ivory White","Krypton Blue","Lavender Rush","Moon White","Pine Green","Space Grey","Sterling Silver","White","Zinc White","Active Black","Active Teal","Aqua Blue","Ash Grey","Assassin Black","Azure Blue","Berry Blue","Carbon Black","Charcoal Black","Cherry Blossom","Cool Grey","Cosmic Onyx","Cream White","Crimsom Red","Crystal Black","Cyan cider","Deep Blue","Electric Blue","Emerald Green","Frost White","Galactic Purple","Gunmetal Black","Ice Blue","Ivory","Jet Black","Lunar White","Maroon Lush","Martian Green","Metallic Grey","Midnight Black","Midnight Blue","Mint Blue","Mist Grey","Mystic Blue","Noir Black","Ocean Blue","Olive Green","Opal Black","Orange","Peach Blush","Pearl White","Pellucid Blue","Purple","Quantum Black","Red","Rose Quartz","Saga Green","Sandstone","Shadow Black","Silver","Slate Grey","Sleek Black","Sonic Silver","Spirit White","Sporty Blue","Starry Blue","Sunset Blush","Teal","Thunder Blue","Velvet Rouge","Yellow Pop"];
+
+// --- MAPPED DATA BASED ON YOUR LIST ---
+const MODEL_DB = {
+    "Ad131": ["Black", "Captain'sBlue", "CherryBlossom", "CrimsonCream", "Iron'sBlood", "White", "King'sBlack", "Blue", "Green", "KryptonBlue"],
+    "Ad138": ["Black", "IvoryWhite", "Blue", "Green", "CherryBlossom"],
+    "Ad141": ["Black", "Cyancider", "White", "OliveGreen"],
+    "Ad148": ["Black", "Cyancider", "White"],
+    "Ad161": ["Coolsapphire", "White", "Black", "AssassinRed", "ElectricBlue", "GreenFury", "ThunderBlue"],
+    "Ad131 Pro": ["Black", "MintBubblegum", "MintCascade", "Blue"],
+    "Ad121 Pro": ["Black", "MintCascade", "Blue", "Mint BubbleGum"],
+    "AD181": ["CoolGrey", "BoldBlue", "SpiritWhite", "CarbonBlack"],
+    "IMT121": ["Black", "White", "Spider-Man", "Greengiant"],
+    "IMT131": ["Black", "White"],
+    "Ad190": ["Black", "White"],
+    "Ad 192": ["Black", "White"],
+    "Atom81": ["OpalBlack", "AeroBlue", "PearlWhite"],
+    "AD183": ["Black", "White", "Grey"],
+    "Ad100": ["Blue", "Black", "Green"],
+    "AD163": ["Blue", "White", "Black"],
+    "Ad138 Pro": ["Black", "Blue", "MintCascade"],
+    "AD191 G": ["Blue", "White", "Red"],
+    "Atom 83": ["Black", "White", "Blue"],
+    "Nirvana": ["White", "Black"],
+    "Nirvana ION N Mold": ["Black"],
+    "Ad170": ["Blue", "Black", "White"],
+    "Alpha": ["JetBlack", "DarkCyan", "SwedishWhite", "AssassinBlack", "Pine Green", "Deep Blue", "Peach Dusk"],
+    "IMT161": ["Black", "White"],
+    "IMT128": ["Black", "White"],
+    "IMT101": ["Black", "White"],
+    "Ad125": ["Black", "White", "Blue"],
+    "Airdopes 207": ["CarbonBlack", "IvoryWhite", "Bold Blue"],
+    "AD Kick": ["CarbonBlack", "White", "Bold Blue"],
+    "Max": ["Black", "White", "Blue"],
+    "AD Hype": ["OpalBlack", "AeroBlue", "PearlWhite"],
+    "Zing": ["Black", "Blue", "White"],
+    "IMT181": ["BlackSabre", "White"],
+    "Joy": ["JetBlack", "DarkCyan", "SwedishWhite"],
+    "Ace": ["Black", "Blue", "Green"],
+    "IMT 100": ["Black", "White"],
+    "Nirvana Ion (ANC)": ["Black", "White", "RoseQuartz", "BlazingComet", "NorthernLights"],
+    "Ad 118": ["Black", "Blue", "Green"],
+    "AD161 Pro-Buds": ["SleekBlack", "Blue", "GreenCyan"],
+    "AD Supreme": ["Black", "White", "Blue", "SageGreen", "MetallicGrey", "SereneGreen"],
+    "AD 71": ["ActiveBlack", "StarryBlue", "FrostWhite", "Aqua Blue", "Maroon Lush", "Grey"],
+    "R 195 Pro": ["FieryBlack"],
+    "Ad 800": ["Black", "Blue", "Green", "White"],
+    "Ultra Plus": ["Black", "SportyBlue", "OliveSlate", "Midnight Black"],
+    "Ad 91": ["MistGrey", "Black", "Blue"],
+    "Ad 300": ["GunmetalBlack", "ChromeWhite", "Purple"],
+    "Ad 161 N": ["CarbonBlack", "AshGrey"],
+    "Ad 120": ["ActiveBlack", "DawnBlue", "IvoryWhite"],
+    "Ad 141 Anc": ["GunmetalBlack", "White", "Green"],
+    "Ad 141 Anc Elite": ["Black", "White", "Green"],
+    "Ad 141 Pro Buds": ["Obsidian Black", "Surfer Silver", "Galactic Purple", "Martian Green"],
+    "Ad 311 Pro": ["ActiveBlack", "DuskBlue", "SpaceGrey", "LavenderRush"],
+    "Ad 161 Anc": ["Black", "Green", "White"],
+    "Ad 155": ["ActiveBlack", "IvoryWhite", "HotRouge", "ActiveTeal"],
+    "Atom 81 Pro": ["ObsidianNoir", "IvoryElegance", "SlateFusion"],
+    "Ad 121Pro Plus": ["Black", "Blue"],
+    "Ad 161 Anc Elite": ["Black", "White", "Blue"],
+    "Nirvana Ion ANC Pro": ["RoseQuartz", "BlazingComet", "NorthernLights", "Crystal Black", "Quartz White"],
+    "Ad Nirvana Crystal": ["Quantum Black", "Blazing Red", "Yellow Pop", "White Lustre"],
+    "Ad 800 Hidef": ["Graphite Grey", "Sterling Silver", "Azure Blue", "Emerald Green"],
+    "Ad 131 Pro Buds": ["Active Black", "Slate Blue", "Coco Brown"],
+    "Ad 301": ["Sunset Blush", "Arctic Whisper", "Midnight Shadow", "Velvet Rouge"],
+    "Ad 131 Elite Anc": ["Active Black", "Active White", "Dawn Blue", "ActiveTeal"],
+    "Ad Primo": ["Black"],
+    "Ad 181 Pro": ["Lilac Serenity", "Frosted Mint", "Coral Bloom", "Mocha Elegance"],
+    "Ad 191 Anc": ["Pellucid White", "Pellucid Orange", "Pellucid Green", "Pellucid Red", "Pellucid Blue"],
+    "Ad 280 Anc": ["Active Black", "Mint Blue"],
+    "Ad Unity ANC": ["Grey", "Black"],
+    "Ad Nirvana Iris": ["Black", "White"],
+    "Ad Nirvana X": ["Galactic Red", "Smoky Amethyst", "Mist Blue", "Cosmic Onyx"],
+    "Ad 91 Prime": ["Midnight Black", "Sonic Silver"],
+    "Ad 111v2": ["White", "Black"],
+    "Ad Ultra Pro": ["Zinc White", "Gunmetal Black"],
+    "Ad Plus 311": ["Ash Grey", "Charcoal Black", "Crimsom Red", "Midnight Blue"],
+    "Ad Plus 318": ["Active Black", "StarryBlue"],
+    "Ad 213": ["Berry Blue", "Sandstone", "Shadow Black"],
+    "Ad 141 Gen 2": ["Active White", "Grey", "Active Black", "Orange", "Teal"],
+    "Ad 148 Gen 2": ["Active White", "Grey", "Orange", "Teal", "Active Black"],
+    "Ad 212": ["Ivory", "Noir Black", "Peach Blush"],
+    "Ad Prime 412": ["Lunar White", "Midnight Black", "Sahara Chic"],
+    "Ad 131 Gen 2": ["CarbonBlack", "Cream White", "Ice Blue"],
+    "Ad 313": ["CarbonBlack", "Gold Mist", "Jade Green"],
+    "HMD P60": ["Black", "White", "Green"],
+    "Ad Alpha Gen 2": ["Midnight Black", "Slate Grey", "Ocean Blue"],
+    "Ad Ace Gen 2": ["Shadow Black", "Moon White", "Mystic Blue"],
+    "HMD S60": ["Grey", "Purple"],
+    "HMD P50": ["Black", "White", "Blue"],
+    "HMD X50": ["Black", "White"],
+    "HMD X50 Pro": ["Silver", "Blue"],
+    "HMD P70": ["Black", "White"],
+    "Amazon basics": ["Black"],
+    "Ad Prime 513 Anc": ["Carbon Black", "Ivory Glow"],
+    "Ad Pulse": ["Shadow Black"],
+    "Ad 138 Gen 2": ["CarbonBlack", "Cream White"]
+};
 
 let sheetData = [];
 google.charts.load('current', {'packages':['corechart', 'bar']});
@@ -215,6 +301,15 @@ google.charts.load('current', {'packages':['corechart', 'bar']});
 window.onload = function() {
     let today = new Date().toLocaleDateString('en-CA');
     ['entryDate', 'recentFilter', 'dashFrom', 'dashTo'].forEach(id => document.getElementById(id).value = today);
+    
+    // Populate the Model Datalist
+    const datalist = document.getElementById('modelList');
+    Object.keys(MODEL_DB).sort().forEach(m => {
+        let opt = document.createElement('option');
+        opt.value = m;
+        datalist.appendChild(opt);
+    });
+
     addLotRow();
     loadAllData();
 };
@@ -260,7 +355,6 @@ function renderRecentTable() {
     });
 }
 
-// Reusable function for generating summary HTML
 function generateSummaryHTML(title, data, subtitle="") {
     let pLots=0, fLots=0, tQty=0, pQty=0;
     let floors = {"Floor 1":{tQ:0, pQ:0, tL:0, pL:0}, "Floor 2":{tQ:0, pQ:0, tL:0, pL:0}, "Basement":{tQ:0, pQ:0, tL:0, pL:0}};
@@ -310,7 +404,6 @@ function showDaySummary() {
     generateSummaryHTML("Daily Production Summary", dayData, "Date: " + formatDateDisplay(fDate));
 }
 
-// NEW FUNCTION: DASHBOARD PREVIEW
 function showDashboardPreview() {
     const from = document.getElementById('dashFrom').value;
     const to = document.getElementById('dashTo').value;
@@ -325,22 +418,59 @@ function showDashboardPreview() {
 function addLotRow(data = null) {
     const tr = document.createElement('tr'); tr.className = 'input-row';
     let lOpts = ''; for(let i=1; i<=21; i++) lOpts += `<option value="${i}">L${i}</option>`;
+    
+    // UPDATED HTML: Model is Input with list, Color is empty select
     tr.innerHTML = `<td><select class="form-select i-line" required><option value="">-</option>${lOpts}</select></td>
-        <td><select class="form-select i-model" required><option value="">-</option>${MODELS.map(m=>`<option value="${m}">${m}</option>`).join('')}</select></td>
-        <td><select class="form-select i-color" required><option value="">-</option>${COLOURS.map(c=>`<option value="${c}">${c}</option>`).join('')}</select></td>
+        <td><input class="form-control i-model" list="modelList" onchange="updateColors(this)" placeholder="Type Model" required></td>
+        <td><select class="form-select i-color" required><option value="">- Select Model -</option></select></td>
         <td><input type="text" class="form-control i-id fw-bold text-uppercase" placeholder="ID" required></td>
         <td><input type="number" class="form-control i-qty" placeholder="0" required></td>
         <td><select class="form-select i-status"><option>Fresh</option><option>Rework</option></select></td>
         <td><select class="form-select i-res fw-bold" onchange="toggleRem(this)"><option value="Pass">Pass</option><option value="Fail">Fail</option></select></td>
         <td><input type="text" class="form-control i-rem" placeholder="Remarks" disabled></td>
         <td><button type="button" class="btn btn-outline-danger btn-sm border-0 px-3" onclick="this.closest('tr').remove()"><i class="bi bi-x-lg"></i></button></td>`;
+    
     document.getElementById('lotContainer').appendChild(tr);
+    
     if(data) {
-        tr.querySelector('.i-line').value=data[1]; tr.querySelector('.i-model').value=data[3]; tr.querySelector('.i-color').value=data[4];
-        tr.querySelector('.i-id').value=data[5]; tr.querySelector('.i-qty').value=data[6]; tr.querySelector('.i-status').value=data[7];
-        tr.querySelector('.i-res').value=data[8]; if(data[8]==='Fail'){ tr.querySelector('.i-rem').disabled=false; tr.querySelector('.i-rem').value=data[9]; }
+        tr.querySelector('.i-line').value=data[1]; 
+        
+        let mInput = tr.querySelector('.i-model');
+        mInput.value = data[3];
+        
+        // Trigger color update manually and wait
+        updateColors(mInput);
+        
+        tr.querySelector('.i-color').value=data[4];
+        
+        tr.querySelector('.i-id').value=data[5]; 
+        tr.querySelector('.i-qty').value=data[6]; 
+        tr.querySelector('.i-status').value=data[7];
+        tr.querySelector('.i-res').value=data[8]; 
+        if(data[8]==='Fail'){ tr.querySelector('.i-rem').disabled=false; tr.querySelector('.i-rem').value=data[9]; }
     }
 }
+
+// NEW FUNCTION: Updates Color Dropdown based on Model
+function updateColors(modelInput) {
+    const row = modelInput.closest('tr');
+    const colorSelect = row.querySelector('.i-color');
+    const model = modelInput.value;
+    
+    colorSelect.innerHTML = '<option value="">- Select -</option>';
+    
+    if (MODEL_DB[model]) {
+        MODEL_DB[model].forEach(c => {
+            let opt = document.createElement('option');
+            opt.value = c;
+            opt.innerText = c;
+            colorSelect.appendChild(opt);
+        });
+    } else {
+        colorSelect.innerHTML = '<option value="">Model not found</option>';
+    }
+}
+
 function toggleRem(sel) { const r=sel.closest('tr').querySelector('.i-rem'); r.disabled=(sel.value==='Pass'); if(sel.value==='Pass')r.value=""; else r.focus(); }
 
 document.getElementById('pdiForm').onsubmit = async (e) => {
@@ -350,8 +480,21 @@ document.getElementById('pdiForm').onsubmit = async (e) => {
     try { await fetch(API_URL, { method: 'POST', body: JSON.stringify((editIdx && editIdx !== "") ? { action: 'edit', rowIndex: parseInt(editIdx), data: rows[0] } : { action: 'save', data: rows }) }); resetForm(); await loadAllData(); alert("Saved!"); } catch (err) { alert("Error"); }
     document.getElementById('loader').style.display='none';
 };
+
 async function deleteRec(idx) { if(confirm("Delete?")) { document.getElementById('loader').style.display='flex'; await fetch(API_URL, {method:'POST', body:JSON.stringify({action:'delete', rowIndex: idx + 2})}); await loadAllData(); } }
-function editRec(idx) { const r = sheetData[idx]; document.getElementById('editRowIndex').value = (idx + 2); document.getElementById('entryDate').value = getCleanDate(r[0]); document.getElementById('lotContainer').innerHTML=""; addLotRow(r); document.getElementById('saveBtn').innerHTML = 'UPDATE'; document.getElementById('formCard').className="card p-4 edit-active"; document.getElementById('addRowBtn').style.display='none'; window.scrollTo(0,0); }
+
+function editRec(idx) { 
+    const r = sheetData[idx]; 
+    document.getElementById('editRowIndex').value = (idx + 2); 
+    document.getElementById('entryDate').value = getCleanDate(r[0]); 
+    document.getElementById('lotContainer').innerHTML=""; 
+    addLotRow(r); // This now handles color population
+    document.getElementById('saveBtn').innerHTML = 'UPDATE'; 
+    document.getElementById('formCard').className="card p-4 edit-active"; 
+    document.getElementById('addRowBtn').style.display='none'; 
+    window.scrollTo(0,0); 
+}
+
 function resetForm() { document.getElementById('pdiForm').reset(); document.getElementById('editRowIndex').value=""; document.getElementById('lotContainer').innerHTML=""; addLotRow(); document.getElementById('saveBtn').innerHTML='SAVE RECORDS'; document.getElementById('formCard').className="card p-4"; document.getElementById('addRowBtn').style.display='inline-block'; }
 
 function runDashboardAnalysis() {
@@ -417,13 +560,10 @@ function runClosureReport() {
     sheetData.forEach(r => { if(r[8] === 'Pass') passedLotIds.add(r[5]); });
 
     sheetData.forEach(r => {
-        // If Fail AND NOT in passed list -> Pending Action
         if(r[8] !== 'Pass' && !passedLotIds.has(r[5])) {
             let item = `<div class="ticket"><div class="d-flex justify-content-between align-items-center mb-1"><span class="ticket-id">${r[5]}</span><span class="badge bg-danger">L${r[1]}</span></div><div class="text-secondary small fw-bold">${r[3]}</div><div class="ticket-defect">${r[9]||"Unspecified"}</div><div class="text-end mt-2 small text-muted">${formatDateDisplay(r[0])}</div></div>`;
             if(r[2]==='Floor 1') f1.innerHTML += item; else if(r[2]==='Floor 2') f2.innerHTML += item; else fb.innerHTML += item;
         }
-        
-        // If Fail AND IS in passed list -> Reworked / Closed (Raw Data Logic)
         if(r[8] !== 'Pass' && passedLotIds.has(r[5])) {
              rwTable.innerHTML += `<tr>
                 <td>${formatDateDisplay(r[0])}</td>
