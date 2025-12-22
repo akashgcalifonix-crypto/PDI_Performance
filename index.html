@@ -35,6 +35,7 @@
         .stat-card:hover { transform: translateY(-5px); }
         .stat-val { font-size: 3rem; font-weight: 800; line-height: 1; margin: 10px 0; }
         .stat-label { font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; }
+        .stat-sub { font-size: 0.8rem; color: #94a3b8; font-weight: 600; }
         
         .b-blue { border-color: var(--accent); color: var(--accent); }
         .b-green { border-color: var(--success); color: var(--success); }
@@ -119,14 +120,16 @@
         </div>
     </div>
 
-    <!-- DASHBOARD TAB (UPDATED KPI & 2X FONT) -->
+    <!-- DASHBOARD TAB (UPDATED WITH PREVIEW) -->
     <div id="tab-dashboard" style="display:none;">
         <div class="card p-4 mb-4 no-print">
             <div class="row g-4 align-items-end">
                 <div class="col-md-3"><label class="fw-bold text-muted">From Date</label><input type="date" id="dashFrom" class="form-control"></div>
                 <div class="col-md-3"><label class="fw-bold text-muted">To Date</label><input type="date" id="dashTo" class="form-control"></div>
                 <div class="col-md-2"><button class="btn btn-primary w-100 fw-bold" onclick="runDashboardAnalysis()">FILTER DATA</button></div>
-                <div class="col-md-4 text-end"><button class="btn btn-danger shadow-sm" onclick="downloadPDF()"><i class="bi bi-file-pdf-fill me-2"></i>Download PDF</button></div>
+                <!-- Added Preview Button -->
+                <div class="col-md-2"><button class="btn btn-info text-white w-100 fw-bold" onclick="showDashboardPreview()"><i class="bi bi-table me-2"></i>PREVIEW DETAILS</button></div>
+                <div class="col-md-2 text-end"><button class="btn btn-danger shadow-sm w-100" onclick="downloadPDF()"><i class="bi bi-file-pdf-fill me-2"></i>Download PDF</button></div>
             </div>
         </div>
         <div id="pdf-content">
@@ -146,7 +149,7 @@
         </div>
     </div>
 
-    <!-- CLOSURE TAB (SMART) -->
+    <!-- CLOSURE TAB (UPDATED WITH REWORK DATA) -->
     <div id="tab-closure" style="display:none;">
         <div class="alert alert-light border shadow-sm p-4 mb-4 d-flex align-items-center">
             <i class="bi bi-info-circle-fill text-primary fs-3 me-3"></i>
@@ -157,6 +160,33 @@
             <div class="col-md-4"><div class="closure-col"><div class="closure-header text-success">Floor 2</div><div id="list_f2"></div></div></div>
             <div class="col-md-4"><div class="closure-col"><div class="closure-header text-dark">Basement</div><div id="list_fb"></div></div></div>
         </div>
+
+        <!-- NEW SECTION: REWORKED / PASSED TICKETS RAW DATA -->
+        <div class="card mt-5">
+            <div class="card-header bg-success text-white d-flex align-items-center">
+                <i class="bi bi-check-all fs-4 me-2"></i>
+                <span class="fs-5">Reworked / Closed Tickets (History)</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-striped table-hover mb-0 text-center align-middle">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>Date (Fail)</th>
+                                <th>Line</th>
+                                <th>Model</th>
+                                <th>Lot ID</th>
+                                <th>Defect</th>
+                                <th>Current Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reworkTableBody">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -165,7 +195,7 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="d-flex align-items-center gap-3"><img src="https://i.postimg.cc/5y7SN4xc/logo.png" style="height: 35px;" class="bg-white rounded px-2"><h5 class="m-0 fw-bold">Daily Production Summary</h5></div>
+                <div class="d-flex align-items-center gap-3"><img src="https://i.postimg.cc/5y7SN4xc/logo.png" style="height: 35px;" class="bg-white rounded px-2"><h5 class="m-0 fw-bold" id="modalTitle">Daily Production Summary</h5></div>
                 <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body bg-light p-4" id="summaryBody"></div>
@@ -230,16 +260,13 @@ function renderRecentTable() {
     });
 }
 
-function showDaySummary() {
-    const fDate = document.getElementById('recentFilter').value;
-    let dayData = sheetData.filter(r => getCleanDate(r[0]) === fDate);
-    if(!dayData.length) return alert("No data found!");
-
+// Reusable function for generating summary HTML
+function generateSummaryHTML(title, data, subtitle="") {
     let pLots=0, fLots=0, tQty=0, pQty=0;
     let floors = {"Floor 1":{tQ:0, pQ:0, tL:0, pL:0}, "Floor 2":{tQ:0, pQ:0, tL:0, pL:0}, "Basement":{tQ:0, pQ:0, tL:0, pL:0}};
     let rejects = [];
 
-    dayData.forEach(r => {
+    data.forEach(r => {
         let q = parseInt(r[6]||0), fl = r[2] || "Floor 1";
         if(!floors[fl]) floors[fl] = {tQ:0, pQ:0, tL:0, pL:0};
         tQty += q; floors[fl].tQ += q; floors[fl].tL++;
@@ -250,14 +277,16 @@ function showDaySummary() {
     Object.keys(floors).forEach(f => { gLots+=floors[f].tL; gPassL+=floors[f].pL; gQty+=floors[f].tQ; gPassQ+=floors[f].pQ; });
     let gRate = gQty>0 ? ((gPassQ/gQty)*100).toFixed(2) : "0.00";
 
+    document.getElementById('modalTitle').innerText = title;
     document.getElementById('summaryBody').innerHTML = `
+        <div class="alert alert-secondary text-center fw-bold">${subtitle}</div>
         <div class="row g-4 mb-4">
             <div class="col-md-3"><div class="stat-card b-dark py-3"><div class="stat-val">${gQty}</div><div class="stat-label">TOTAL UNITS</div><div class="stat-sub">(Lots: ${gLots})</div></div></div>
             <div class="col-md-3"><div class="stat-card b-green py-3"><div class="stat-val">${gPassQ}</div><div class="stat-label">PASSED UNITS</div><div class="stat-sub">(Lots: ${gPassL})</div></div></div>
             <div class="col-md-3"><div class="stat-card b-red py-3"><div class="stat-val">${gQty-gPassQ}</div><div class="stat-label">REJECTED UNITS</div><div class="stat-sub">(Lots: ${gLots-gPassL})</div></div></div>
             <div class="col-md-3"><div class="stat-card b-blue py-3"><div class="stat-val">${gRate}%</div><div class="stat-label">PASS RATE</div></div></div>
         </div>
-        <h6 class="fw-bold mb-3 text-secondary">FLOOR WISE PERFORMANCE - ${fDate.split('-').reverse().join('/')}</h6>
+        <h6 class="fw-bold mb-3 text-secondary">FLOOR WISE PERFORMANCE</h6>
         <div class="card border-0 shadow-sm mb-4">
             <table class="table pro-table mb-0 text-center table-bordered">
                 <thead><tr><th class="bg-light">Floor Name</th><th>Lots</th><th>Passed</th><th>Total Qty</th><th>Pass Qty</th><th>Rate %</th></tr></thead>
@@ -268,10 +297,29 @@ function showDaySummary() {
                 <tfoot class="total-row"><tr><td class="text-start ps-4">GRAND TOTAL</td><td>${gLots}</td><td>${gPassL}</td><td>${gQty}</td><td>${gPassQ}</td><td>${gRate}%</td></tr></tfoot>
             </table>
         </div>
-        <h6 class="fw-bold text-danger">REJECTED LOTS</h6>
-        ${rejects.length > 0 ? `<table class="table table-striped text-center"><thead class="table-danger"><tr><th>Line</th><th>Model</th><th>ID</th><th>Defect</th></tr></thead><tbody>${rejects.map(r => `<tr><td>L${r[1]}</td><td>${r[3]}</td><td class="fw-bold">${r[5]}</td><td class="text-danger">${r[9]}</td></tr>`).join('')}</tbody></table>` : `<div class="alert alert-success">No rejections found!</div>`}
+        <h6 class="fw-bold text-danger">REJECTED LOTS (RAW DATA)</h6>
+        ${rejects.length > 0 ? `<table class="table table-striped text-center"><thead class="table-danger"><tr><th>Line</th><th>Model</th><th>ID</th><th>Defect</th><th>Date</th></tr></thead><tbody>${rejects.map(r => `<tr><td>L${r[1]}</td><td>${r[3]}</td><td class="fw-bold">${r[5]}</td><td class="text-danger">${r[9]}</td><td>${formatDateDisplay(r[0])}</td></tr>`).join('')}</tbody></table>` : `<div class="alert alert-success">No rejections found in this selection!</div>`}
     `;
     new bootstrap.Modal(document.getElementById('summaryModal')).show();
+}
+
+function showDaySummary() {
+    const fDate = document.getElementById('recentFilter').value;
+    let dayData = sheetData.filter(r => getCleanDate(r[0]) === fDate);
+    if(!dayData.length) return alert("No data found!");
+    generateSummaryHTML("Daily Production Summary", dayData, "Date: " + formatDateDisplay(fDate));
+}
+
+// NEW FUNCTION: DASHBOARD PREVIEW
+function showDashboardPreview() {
+    const from = document.getElementById('dashFrom').value;
+    const to = document.getElementById('dashTo').value;
+    let rangeData = sheetData.filter(r => {
+        let rd = getCleanDate(r[0]);
+        return rd >= from && rd <= to;
+    });
+    if(!rangeData.length) return alert("No data found in selected range!");
+    generateSummaryHTML("Dashboard Analysis Preview", rangeData, "Range: " + formatDateDisplay(from) + " to " + formatDateDisplay(to));
 }
 
 function addLotRow(data = null) {
@@ -326,13 +374,11 @@ function runDashboardAnalysis() {
         }
     });
 
-    // UPDATED KPI IDs
     document.getElementById('d_total_qty').innerText = dQty; 
     document.getElementById('d_passed_qty').innerText = pQty;
     document.getElementById('d_rejected_qty').innerText = dQty - pQty;
     document.getElementById('d_pass_rate').innerText = dQty ? ((pQty/dQty)*100).toFixed(1)+"%" : "0%";
 
-    // UPDATED CHARTS (2X FONT SIZE)
     const drawBar = (id, arr, title, isPercent=true) => {
         let chartData = arr.map(row => {
             let val = row[1];
@@ -347,7 +393,7 @@ function runDashboardAnalysis() {
         new google.visualization.ColumnChart(document.getElementById(id)).draw(dt, {
             title: title, legend: { position: "none" }, vAxis: { minValue: 0 },
             chartArea: { width: '85%', height: '75%' },
-            annotations: { textStyle: { fontSize: 26, bold: true, color: '#000' }, alwaysOutside: false } // 2X Font
+            annotations: { textStyle: { fontSize: 26, bold: true, color: '#000' }, alwaysOutside: false } 
         });
     };
 
@@ -364,16 +410,35 @@ function runDashboardAnalysis() {
 function runClosureReport() {
     let f1=document.getElementById('list_f1'), f2=document.getElementById('list_f2'), fb=document.getElementById('list_fb');
     f1.innerHTML=f2.innerHTML=fb.innerHTML="";
+    let rwTable = document.getElementById('reworkTableBody');
+    rwTable.innerHTML = "";
     
     let passedLotIds = new Set();
     sheetData.forEach(r => { if(r[8] === 'Pass') passedLotIds.add(r[5]); });
 
     sheetData.forEach(r => {
+        // If Fail AND NOT in passed list -> Pending Action
         if(r[8] !== 'Pass' && !passedLotIds.has(r[5])) {
             let item = `<div class="ticket"><div class="d-flex justify-content-between align-items-center mb-1"><span class="ticket-id">${r[5]}</span><span class="badge bg-danger">L${r[1]}</span></div><div class="text-secondary small fw-bold">${r[3]}</div><div class="ticket-defect">${r[9]||"Unspecified"}</div><div class="text-end mt-2 small text-muted">${formatDateDisplay(r[0])}</div></div>`;
             if(r[2]==='Floor 1') f1.innerHTML += item; else if(r[2]==='Floor 2') f2.innerHTML += item; else fb.innerHTML += item;
         }
+        
+        // If Fail AND IS in passed list -> Reworked / Closed (Raw Data Logic)
+        if(r[8] !== 'Pass' && passedLotIds.has(r[5])) {
+             rwTable.innerHTML += `<tr>
+                <td>${formatDateDisplay(r[0])}</td>
+                <td>L${r[1]}</td>
+                <td>${r[3]}</td>
+                <td class="fw-bold">${r[5]}</td>
+                <td class="text-danger">${r[9]}</td>
+                <td><span class="badge bg-success">Closed / Passed</span></td>
+             </tr>`;
+        }
     });
+}
+function downloadPDF() {
+    const el = document.getElementById('pdf-content');
+    html2pdf().set({ margin: 10, filename: 'Dashboard_Report.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } }).from(el).save();
 }
 </script>
 </body>
